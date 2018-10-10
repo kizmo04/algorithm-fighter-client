@@ -1,17 +1,35 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class Auth extends Component {
-  handlOnClick(e) {
-    e.preventDefault();
-    this.props.authenticateUser();
+  constructor(props) {
+    super(props);
+    this.handlOnGitHubLoginButtonClick = this.handlOnGitHubLoginButtonClick.bind(this);
+    this.handleOnCloseButtonClick = this.handleOnCloseButtonClick.bind(this);
+  }
+  handlOnGitHubLoginButtonClick() {
+    this.props.onGitHubLoginButtonClick();
+  }
+
+  handleOnCloseButtonClick() {
+    this.props.onCloseButtonClick();
   }
   render() {
+    const { isActive } = this.props;
+    console.log(isActive)
     return (
-      <section className="section">
-        <div className="container">
-          <button className="button" onClick={this.handlOnClick.bind(this)}>Github Log In</button>
+      <div className="modal is-active">
+        <div className="modal-background">
+          <div className="modal-content">
+            <button onClick={this.handlOnGitHubLoginButtonClick} className="button is-large">
+              <span className="icon is-medium">
+                <i className="fab fa-github" />
+              </span>
+              <span>GitHub</span>
+            </button>
+          </div>
         </div>
-      </section>
+        <button onClick={this.handleOnCloseButtonClick} className="modal-close is-large" aria-label="close" />
+      </div>
     );
   }
 }

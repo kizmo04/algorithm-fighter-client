@@ -3,14 +3,28 @@ import { Link } from "react-router-dom";
 import "./Nav.scss";
 
 class Nav extends Component {
+  constructor(props) {
+    super(props);
+    this.handleOnLogoutButtonClick = this.handleOnLogoutButtonClick.bind(this);
+    this.handleOnLoginButtonClick = this.handleOnLoginButtonClick.bind(this);
+  }
+  handleOnLogoutButtonClick() {
+    this.props.onLogoutButtonClick();
+  }
+  handleOnLoginButtonClick() {
+    console.log("click!!!");
+    this.props.onLoginButtonClick();
+  }
   render() {
+    const { token } = this.props;
     return (
       <nav className="navbar">
         <div className="navbar-brand">
           <Link to="/">
             <img src="" alt="" />
           </Link>
-          <a
+          <Link
+            to=""
             role="button"
             className="navbar-burger"
             aria-label="menu"
@@ -19,23 +33,31 @@ class Nav extends Component {
             <span aria-hidden="true" />
             <span aria-hidden="true" />
             <span aria-hidden="true" />
-          </a>
+          </Link>
         </div>
         <div className="navbar-menu">
-          <div className="navbar-end">
-            <Link className="navbar-item button is-info is-medium is-outlined" to="/">
-              exit
-            </Link>
-            <Link className="navbar-item button is-success is-medium is-outlined" to="/">
-              Log out
-            </Link>
-            <Link className="navbar-item button is-warning is-medium is-outlined" to="/signup">
-              Log in / Sign up
-            </Link>
-            <Link className="navbar-item button is-danger is-medium is-outlined" to="/">
-              Profile
-            </Link>
-          </div>
+          {token ? (
+            <div className="navbar-end">
+              <button
+                className="navbar-item button is-success is-medium is-outlined"
+                onClick={this.handleOnLogoutButtonClick}
+              >
+                Log out
+              </button>
+              <button className="navbar-item image is-64x64">
+                <img className="is-rounded" src="" alt="" />
+              </button>
+            </div>
+          ) : (
+            <div className="navbar-end">
+              <button
+                className="navbar-item button is-warning is-medium is-outlined"
+                onClick={this.handleOnLoginButtonClick}
+              >
+                Log in / Sign up
+              </button>
+            </div>
+          )}
         </div>
       </nav>
     );

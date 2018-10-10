@@ -1,7 +1,9 @@
 import { connect } from 'react-redux';
 import AppComponent from '../components/App/App';
 import { signIn as signInGitHub, signOut as signOutGitHub } from '../utils/firebase';
-import { successUserAuthenticate } from '../actions';
+import jwt from 'jsonwebtoken';
+import { secret } from '../config/jwt';
+import { successUserAuthenticate, logOutUser, activateAuthModal, deactivateAuthModal } from '../actions';
 
 const mapStateToProps = state => Object.assign({}, state);
 
@@ -26,14 +28,19 @@ const mapDispatchToProps = dispatch => {
             profile_image_url: photoURL
           })
         })
-        .then(response => response.json())
+        .then(response => {
+          const contentType = response.headers.get("content-type");
+          if(response.ok && contentType && contentType.includes("application/json")) {
+            return response.json();
+          }
+          throw new Error();
+        })
         .then(body => {
-          const { user, token } = body;
-          const { email, joined_date, name, profile_image_url, short_bio, solutions, user_name, _id } = user;
+          const { token } = body;
           dispatch(successUserAuthenticate(token));
         })
         .catch(err => {
-          console.log(err);
+          console.log(err)
         });
       })
       .catch(err => {
@@ -44,11 +51,25 @@ const mapDispatchToProps = dispatch => {
     logoutUser() {
       signOutGitHub()
       .then(() => {
-
+        dispatch(logOutUser());
       })
       .catch(err => {
         console.log(err);
       })
+    },
+
+    getUserInfo(token) {
+      jwt.verify(token, secret, function(err, decoded) {
+        console.log(decoded);
+      });
+    },
+
+    handleActivateAuthModal() {
+      dispatch(activateAuthModal());
+    },
+
+    handleDeactivateAuthModal() {
+      dispatch(deactivateAuthModal());
     }
 
   };

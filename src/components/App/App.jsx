@@ -8,21 +8,18 @@ import Auth from '../Auth/Auth';
 class App extends Component {
 
   render() {
-    const { token, authenticateUser } = this.props;
+    const { token, authenticateUser, logoutUser, isAuthModalActive, handleActivateAuthModal, handleDeactivateAuthModal } = this.props;
     return (
       <div className="App">
-        <Nav />
+        <Nav token={token} onLoginButtonClick={handleActivateAuthModal} onLogoutButtonClick={logoutUser}/>
         <Switch>
-          <Route exact path="/" component={Main}/>
-          <Route path="/signup" render={() => {
-            if (!token) {
-              return <Auth authenticateUser={authenticateUser} />;
-            } else {
-              return <Redirect to="/" />;
-            }
-          }} />
-
+          <Route exact path="/" render={() => <Main />}/>
         </Switch>
+        {
+          !token && isAuthModalActive ?
+          <Auth isActive={isAuthModalActive} onCloseButtonClick={handleDeactivateAuthModal} onGitHubLoginButtonClick={authenticateUser} />
+          : null
+        }
       </div>
     );
   }
