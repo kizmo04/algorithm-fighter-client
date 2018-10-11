@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import './Modal.scss';
 
 class Auth extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ class Auth extends Component {
       <div className={`modal ${isActive ? 'is-active' : ''}`}>
         <div className="modal-background">
           <div className="modal-content">
-            <button onClick={this.handleOnGitHubLoginButtonClick} className="button is-large">
+            <button onClick={this.handleOnGitHubLoginButtonClick} className="button is-large github-login-button">
               <span className="icon is-medium">
                 <i className="fab fa-github" />
               </span>

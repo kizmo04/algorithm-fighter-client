@@ -3,7 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import "./App.scss";
 import Nav from "../Nav/Nav";
 import Main from '../Main/Main';
-import Auth from '../Auth/Auth';
+import Modal from '../Modal/Modal';
 
 // import io from 'socket.io-client';
 // const socket = io('http://localhost:5000');
@@ -40,7 +40,7 @@ class App extends Component {
         </Switch>
         {
           !token && isAuthModalActive ?
-          <Auth isActive={isAuthModalActive} onCloseButtonClick={handleDeactivateAuthModal} onGitHubLoginButtonClick={authenticateUser} />
+          <Modal isActive={isAuthModalActive} onCloseButtonClick={handleDeactivateAuthModal} onGitHubLoginButtonClick={authenticateUser} />
           : null
         }
       </div>

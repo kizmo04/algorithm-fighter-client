@@ -5,6 +5,7 @@ export const socket = io('http://localhost:5000');
 socket.on('requst user info', ({ hostSocketId, hostUser, combatRoomKey }) => {
   // hostUser의 요청에 따라 게스트들의 유저 정보를 보냄.
   console.log(`client request user info, ${hostUser.email} find someone`, hostSocketId);
+  console.log(`in client request user info- socket: ${socket}, socket.id: ${socket.id}`);
   socket.emit('response user info', {
     hostSocketId,
     hostUser,
@@ -27,23 +28,28 @@ socket.on('requst user info', ({ hostSocketId, hostUser, combatRoomKey }) => {
 //   console.log('combat : ' + user);
 // });
 
-socket.on('join guest', (guestUser, participants) => {
+socket.on('join guest', ({hostUser, combatRoomKey, guestSocketId, hostSocketId, guestUser, participants}) => {
   // 안내 메세지 현재 두 클라이언트가 같은 room 에 join한 시점
   // 게임 시작
-  // 매칭이 되면 room 말고 namespace를 바꿀 것.. 탐색에 안걸리고 메세지도 안 가도록.
-  console.log(`${guestUser.email} 님이 입장했습니다!!!! 현재 인원 ${participants}`)
+  // console.log(`in join guest : ${guestUser}`)
+  if (guestUser) {
+    console.log(`${guestUser.email} 님이 입장했습니다!!!! 현재 인원 ${participants}`);
+  } else {
+    console.log('전투실에 입장했습니다.');
+
+  }
 });
 
-socket.on('waiting for guest to accept', guestUser => {
+socket.on('waiting for guest to accept', ({guestUser}) => {
   // 상대를 찾은 시점, 모달에 안내메세지 띄우기, 스피너
   console.log(`${guestUser.email}님의 수락을 기다리는 중입니다.`)
 });
 
-socket.on('will you join?', ({ hostUser, combatRoomKey, guestUser, guestSocketId }) => {
+socket.on('will you join?', ({ hostUser, combatRoomKey, guestSocketId, hostSocketId, guestUser }) => {
   // 모달에 상대 유저 정보와 전투 수락 버튼 띄워주기
   console.log(`${hostUser.email} 님과 전투를 수락하겠습니까??`)
   // 전투 수락버튼 누를 경우
-  socket.emit('accept combat', {combatRoomKey, guestUser, guestSocketId});
+  socket.emit('accept combat', {hostUser, combatRoomKey, guestSocketId, hostSocketId, guestUser});
   // 전투 거절할 경우
   // socket.emit('reject')
   // in server - hostUser에게 통보, host는 재탐색
