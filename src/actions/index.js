@@ -5,10 +5,11 @@ import {
   DEACTIVATE_AUTH_MODAL
 } from '../constants/actionTypes';
 
-export function successUserAuthenticate(token) {
+export function successUserAuthenticate(token, user) {
   return {
     type: SUCCESS_USER_AUTHENTICATE,
-    token
+    token,
+    user
   };
 }
 

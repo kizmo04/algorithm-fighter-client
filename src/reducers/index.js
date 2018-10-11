@@ -7,18 +7,21 @@ import {
 
 const initialState = {
   token: '',
-  isAuthModalActive: false
+  isAuthModalActive: false,
+  user: {}
 };
 
 function reducer(state = initialState, action) {
   switch(action.type) {
     case SUCCESS_USER_AUTHENTICATE:
       return Object.assign({}, state, {
-        token: action.token
+        token: action.token,
+        user: action.user
       });
     case LOG_OUT_USER:
       return Object.assign({}, state, {
-        token: ''
+        token: '',
+        isAuthModalActive: false
       });
     case ACTIVATE_AUTH_MODAL:
       return Object.assign({}, state, {

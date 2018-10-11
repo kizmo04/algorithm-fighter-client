@@ -16,7 +16,7 @@ class Nav extends Component {
     this.props.onLoginButtonClick();
   }
   render() {
-    const { token } = this.props;
+    const { token, imageUrl } = this.props;
     return (
       <nav className="navbar">
         <div className="navbar-brand">
@@ -44,9 +44,9 @@ class Nav extends Component {
               >
                 Log out
               </button>
-              <button className="navbar-item image is-64x64">
-                <img className="is-rounded" src="" alt="" />
-              </button>
+            <figure className="image is-64x64">
+              <img className="is-rounded" src={imageUrl} alt="" />
+            </figure>
             </div>
           ) : (
             <div className="navbar-end">

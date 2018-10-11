@@ -14,10 +14,12 @@ import {
 } from "connected-react-router";
 
 const history = createBrowserHistory();
-const store = createStore(
+export const store = createStore(
   connectRouter(history)(reducer),
   compose(applyMiddleware(routerMiddleware(history), logger))
 );
+
+// store.subscribe(handleSocketRequestUserInfo.bind(null, store.getState().user));
 
 render(
   <Provider store={store}>

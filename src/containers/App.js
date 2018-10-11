@@ -1,9 +1,11 @@
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import AppComponent from '../components/App/App';
 import { signIn as signInGitHub, signOut as signOutGitHub } from '../utils/firebase';
 import jwt from 'jsonwebtoken';
 import { secret } from '../config/jwt';
 import { successUserAuthenticate, logOutUser, activateAuthModal, deactivateAuthModal } from '../actions';
+import { socket } from '../utils/socket';
 
 const mapStateToProps = state => Object.assign({}, state);
 
@@ -37,17 +39,32 @@ const mapDispatchToProps = dispatch => {
         })
         .then(body => {
           const { token } = body;
-          dispatch(successUserAuthenticate(token));
+          jwt.verify(token, secret, function(err, decoded) {
+            if (err) {
+              console.log(err);
+            }
+            const { name, userName, profileImageUrl, email, shortBio } = decoded;
+            const user = {
+              name,
+              userName,
+              profileImageUrl,
+              email,
+              shortBio
+            };
+            dispatch(successUserAuthenticate(token, user));
+            // const socket = io('http://localhost:5000/waiting', { transports: ['websocket']});
+            socket.emit('connect user', user);
+          });
         })
         .catch(err => {
-          console.log(err)
+          console.log(err.message)
         });
       })
       .catch(err => {
-        console.log(err)
+        console.log(err.message)
       });
-
     },
+
     logoutUser() {
       signOutGitHub()
       .then(() => {
@@ -59,9 +76,7 @@ const mapDispatchToProps = dispatch => {
     },
 
     getUserInfo(token) {
-      jwt.verify(token, secret, function(err, decoded) {
-        console.log(decoded);
-      });
+
     },
 
     handleActivateAuthModal() {
@@ -70,6 +85,10 @@ const mapDispatchToProps = dispatch => {
 
     handleDeactivateAuthModal() {
       dispatch(deactivateAuthModal());
+    },
+    findingMatch(user){
+      console.log('client click finding match');
+      socket.emit('find someone to match', user);
     }
 
   };
