@@ -1,8 +1,12 @@
 .navbar {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  padding-top: 1rem;
 }
 
-.button {
-  margin-right: 10px;
+.navbar-end {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 2vw;
+  & .button {
+    margin-right: 2vw;
+  }
 }

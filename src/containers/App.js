@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import AppComponent from '../components/App/App';
-import { signIn as signInGitHub, signOut as signOutGitHub } from '../utils/firebase';
+import { signIn as signInGitHub, signOut as signOutGitHub } from '../lib/firebase';
 import jwt from 'jsonwebtoken';
 import { secret } from '../config/jwt';
-import { successUserAuthenticate, logOutUser, activateAuthModal, deactivateAuthModal } from '../actions';
-import { socket } from '../utils/socket';
+import { successUserAuthenticate, logOutUser, openAuthModal, closeModal, openMatchingModal, inviteMatchUser, gotMatchInvitation } from '../actions';
+import { socket } from '../lib/socket';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import {waitingGuestToAcceptSocket, showMatchInvitaion, sendAcceptCombatMessage} from '../lib/socket';
+// import { github } from '@fortawesome/free-solid-svg-icons'
+
+library.add(fab);
 
 const mapStateToProps = state => Object.assign({}, state);
 
@@ -53,7 +59,7 @@ const mapDispatchToProps = dispatch => {
             };
             dispatch(successUserAuthenticate(token, user));
             // const socket = io('http://localhost:5000/waiting', { transports: ['websocket']});
-            socket.emit('connect user', user);
+            socket.emit('login user', user);
           });
         })
         .catch(err => {
@@ -69,6 +75,7 @@ const mapDispatchToProps = dispatch => {
       signOutGitHub()
       .then(() => {
         dispatch(logOutUser());
+        socket.emit('logout user');
       })
       .catch(err => {
         console.log(err);
@@ -79,18 +86,29 @@ const mapDispatchToProps = dispatch => {
 
     },
 
-    handleActivateAuthModal() {
-      dispatch(activateAuthModal());
+    handleOpenAuthModal() {
+      dispatch(openAuthModal());
     },
 
-    handleDeactivateAuthModal() {
-      dispatch(deactivateAuthModal());
+    handleCloseModal() {
+      dispatch(closeModal());
     },
-    findingMatch(user){
-      console.log('client click finding match');
-      socket.emit('find someone to match', user);
+    findingMatchOrLogin(user){
+      if (Object.keys(user).length) {
+        console.log(`${user.email} click finding match!`);
+        socket.emit('find someone to match', user);
+        dispatch(openMatchingModal());
+        waitingGuestToAcceptSocket(dispatch, inviteMatchUser);
+      } else {
+        dispatch(openAuthModal());
+      }
+    },
+    handleGotInvitationEvent() {
+      showMatchInvitaion(dispatch, gotMatchInvitation);
+    },
+    handleSendAcceptMessageEvent(data) {
+      sendAcceptCombatMessage(dispatch, closeModal, data);
     }
-
   };
 };
 

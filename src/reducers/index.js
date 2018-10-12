@@ -1,14 +1,23 @@
 import {
   SUCCESS_USER_AUTHENTICATE,
   LOG_OUT_USER,
-  ACTIVATE_AUTH_MODAL,
-  DEACTIVATE_AUTH_MODAL
+  OPEN_AUTH_MODAL,
+  CLOSE_MODAL,
+  OPEN_MATCHING_MODAL,
+  INVITE_MATCH_USER,
+  OPPONENT_ACCEPT_MATCH,
+  GOT_MATCH_INVITATION,
 } from '../constants/actionTypes';
 
 const initialState = {
   token: '',
-  isAuthModalActive: false,
-  user: {}
+  user: {},
+  isModalActive: false,
+  modalType: '',
+  modalMessage: '',
+  matchingStage: 0,
+  matchingUser: {},
+  combatRoomKey: '',
 };
 
 function reducer(state = initialState, action) {
@@ -16,20 +25,54 @@ function reducer(state = initialState, action) {
     case SUCCESS_USER_AUTHENTICATE:
       return Object.assign({}, state, {
         token: action.token,
-        user: action.user
+        user: action.user,
+        modalType: action.modalType,
+        isModalActive: action.isModalActive,
       });
     case LOG_OUT_USER:
       return Object.assign({}, state, {
-        token: '',
-        isAuthModalActive: false
+        token: action.token,
+        modalType: action.modalType,
+        isModalActive: action.isModalActive,
       });
-    case ACTIVATE_AUTH_MODAL:
+    case OPEN_AUTH_MODAL:
       return Object.assign({}, state, {
-        isAuthModalActive: true
+        modalType: action.modalType,
+        isModalActive: action.isModalActive,
       });
-    case DEACTIVATE_AUTH_MODAL:
+    case OPEN_MATCHING_MODAL:
       return Object.assign({}, state, {
-        isAuthModalActive: false
+        modalType: action.modalType,
+        isModalActive: action.isModalActive,
+        modalMessage: action.modalMessage,
+        matchingStage: action.matchingStage,
+      });
+    case CLOSE_MODAL:
+      return Object.assign({}, state, {
+        modalType: action.modalType,
+        isModalActive: action.isModalActive,
+        modalMessage: action.modalMessage,
+      });
+    case INVITE_MATCH_USER:
+      return Object.assign({}, state, {
+        modalMessage: action.modalMessage,
+        matchingStage: action.matchingStage,
+        matchingUser: action.matchingUser,
+      });
+    case OPPONENT_ACCEPT_MATCH:
+      return Object.assign({}, state, {
+        modalMessage: action.modalMessage,
+        matchingUser: action.matchingUser,
+        matchingStage: action.matchingStage,
+      });
+    case GOT_MATCH_INVITATION:
+      return Object.assign({}, state, {
+        isModalActive: action.isModalActive,
+        modalType: action.modalType,
+        modalMessage: action.modalMessage,
+        matchingUser: action.matchingUser,
+        matchingStage: action.matchingStage,
+        combatRoomKey: action.combatRoomKey,
       });
     default:
       return state;

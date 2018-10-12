@@ -5,12 +5,17 @@ import Nav from "../Nav/Nav";
 import Main from '../Main/Main';
 import Modal from '../Modal/Modal';
 
+
 // import io from 'socket.io-client';
 // const socket = io('http://localhost:5000');
 
 
 
 class App extends Component {
+
+  componentDidMount() {
+    this.props.handleGotInvitationEvent();
+  }
 
   componentDidUpdate() {
 
@@ -30,17 +35,17 @@ class App extends Component {
   }
 
   render() {
-    const { token, authenticateUser, logoutUser, isAuthModalActive, handleActivateAuthModal, handleDeactivateAuthModal, findingMatch, user } = this.props;
+    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, handleOpenAuthModal, handleCloseModal, findingMatchOrLogin, user, matchingStage, matchingUser, handleSendAcceptMessageEvent, combatRoomKey } = this.props;
     const { profileImageUrl } = this.props.user;
     return (
       <div className="App">
-        <Nav imageUrl={profileImageUrl} token={token} onLoginButtonClick={handleActivateAuthModal} onLogoutButtonClick={logoutUser}/>
+        <Nav imageUrl={profileImageUrl} token={token} onLoginButtonClick={handleOpenAuthModal} onLogoutButtonClick={logoutUser}/>
         <Switch>
-          <Route exact path="/" render={() => <Main user={user} onBattleButtonClick={findingMatch} />}/>
+          <Route exact path="/" render={() => <Main user={user} onBattleButtonClick={findingMatchOrLogin} />}/>
         </Switch>
         {
-          !token && isAuthModalActive ?
-          <Modal isActive={isAuthModalActive} onCloseButtonClick={handleDeactivateAuthModal} onGitHubLoginButtonClick={authenticateUser} />
+          isModalActive ?
+          <Modal combatRoomKey={combatRoomKey} onAcceptButtonClick={handleSendAcceptMessageEvent} isActive={isModalActive} modalMessage={modalMessage} matchingUser={matchingUser} matchingStage={matchingStage} modalType={modalType} onCloseButtonClick={handleCloseModal} onGitHubLoginButtonClick={authenticateUser} />
           : null
         }
       </div>
