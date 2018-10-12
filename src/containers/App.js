@@ -4,11 +4,25 @@ import AppComponent from '../components/App/App';
 import { signIn as signInGitHub, signOut as signOutGitHub } from '../lib/firebase';
 import jwt from 'jsonwebtoken';
 import { secret } from '../config/jwt';
-import { successUserAuthenticate, logOutUser, openAuthModal, closeModal, openMatchingModal, inviteMatchUser, gotMatchInvitation } from '../actions';
+import { successUserAuthenticate, logOutUser, openAuthModal, closeModal, openMatchingModal, inviteMatchUser, gotMatchInvitation, findingFailureOpponentRejectCombat, findingFailureThereIsNoOne } from '../actions';
 import { socket } from '../lib/socket';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
-import {waitingGuestToAcceptSocket, showMatchInvitaion, sendAcceptCombatMessage} from '../lib/socket';
+import {
+  emitAcceptance, 
+  emitRefuse,
+  subscribeWaitingToAccept,
+  subscribeInvite,
+  subscribeRefuse,
+  subscribeNoOpponent,
+} from '../lib/socket';
+import {
+  USER_LOGOUT,
+  USER_LOGIN,
+  REQUEST_OPPONENT,
+
+
+} from '../constants/socketEventTypes';
 // import { github } from '@fortawesome/free-solid-svg-icons'
 
 library.add(fab);
@@ -59,7 +73,7 @@ const mapDispatchToProps = dispatch => {
             };
             dispatch(successUserAuthenticate(token, user));
             // const socket = io('http://localhost:5000/waiting', { transports: ['websocket']});
-            socket.emit('login user', user);
+            socket.emit(USER_LOGIN, user);
           });
         })
         .catch(err => {
@@ -75,7 +89,7 @@ const mapDispatchToProps = dispatch => {
       signOutGitHub()
       .then(() => {
         dispatch(logOutUser());
-        socket.emit('logout user');
+        socket.emit(USER_LOGOUT);
       })
       .catch(err => {
         console.log(err);
@@ -93,22 +107,38 @@ const mapDispatchToProps = dispatch => {
     handleCloseModal() {
       dispatch(closeModal());
     },
-    findingMatchOrLogin(user){
+    findingMatchOrLogin(user, combatRoomKey){
       if (Object.keys(user).length) {
-        console.log(`${user.email} click finding match!`);
-        socket.emit('find someone to match', user);
+        socket.emit(REQUEST_OPPONENT, user, combatRoomKey);
         dispatch(openMatchingModal());
-        waitingGuestToAcceptSocket(dispatch, inviteMatchUser);
+        subscribeWaitingToAccept(user => {
+          dispatch(inviteMatchUser(user));
+        });
+        subscribeRefuse(combatRoomKey => {
+          dispatch(findingFailureOpponentRejectCombat(combatRoomKey));
+        });
+        subscribeNoOpponent(() => {
+          dispatch(findingFailureThereIsNoOne());
+        });
       } else {
         dispatch(openAuthModal());
       }
     },
-    handleGotInvitationEvent() {
-      showMatchInvitaion(dispatch, gotMatchInvitation);
+    subscribeInvite() {
+      subscribeInvite((hostUser, combatRoomKey) => {
+        dispatch(gotMatchInvitation(hostUser, combatRoomKey));
+      });
     },
-    handleSendAcceptMessageEvent(data) {
-      sendAcceptCombatMessage(dispatch, closeModal, data);
-    }
+    emitAcceptance({ combatRoomKey, guestUser }) {
+      emitAcceptance(({ combatRoomKey, guestUser }) => {
+        dispatch(closeModal({ combatRoomKey }));
+      }, {combatRoomKey, guestUser});
+    },
+    emitRefuse({ combatRoomKey, guestUser }) {
+      emitRefuse(({ combatRoomKey, guestUser }) => {
+        dispatch(closeModal({ combatRoomKey }));
+      }, {combatRoomKey, guestUser});
+    },
   };
 };
 

@@ -4,7 +4,8 @@ class ModalMatching extends Component {
   constructor(props) {
     super(props);
     this.handleAcceptButtonClick = this.handleAcceptButtonClick.bind(this);
-    this.handleCancleButtonClick = this.handleCancleButtonClick.bind(this);
+    this.handleCancelButtonClick = this.handleCancelButtonClick.bind(this);
+    this.handleRetryButtonClick = this.handleRetryButtonClick.bind(this);
   }
 
   handleAcceptButtonClick () {
@@ -12,8 +13,15 @@ class ModalMatching extends Component {
     onAcceptButtonClick({ combatRoomKey, guestUser: user });
   }
 
-  handleCancleButtonClick () {
+  handleCancelButtonClick () {
+    const { combatRoomKey, user, onCancelButtonClick } = this.props;
+    onCancelButtonClick({ combatRoomKey, guestUser: user });
 
+  }
+
+  handleRetryButtonClick () {
+    const { onRetryButtonClick, user, combatRoomKey } = this.props;
+    onRetryButtonClick(user, combatRoomKey);
   }
 
 
@@ -40,7 +48,13 @@ class ModalMatching extends Component {
           <div>
             <span>{message}</span>
             <button className="button is-small" onClick={this.handleAcceptButtonClick}>수락</button>
-            {/* <button className="button is-small" onClick={}>거절</button> */}
+            <button className="button is-small" onClick={this.handleCancelButtonClick}>거절</button>
+          </div>
+        ) :
+        stage === 5 ? (
+          <div>
+            <span>{message}</span>
+            <button className="button is-small" onClick={this.handleRetryButtonClick}>다시 찾기</button>
           </div>
         ) : null
       }

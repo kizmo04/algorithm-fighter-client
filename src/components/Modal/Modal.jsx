@@ -14,7 +14,7 @@ class Auth extends Component {
     this.props.onCloseButtonClick();
   }
   render() {
-    const { isActive, modalType, modalMessage, onGitHubLoginButtonClick, matchingStage, matchingUser, onAcceptButtonClick, combatRoomKey } = this.props;
+    const { isActive, modalType, modalMessage, onGitHubLoginButtonClick, matchingStage, matchingUser, onAcceptButtonClick, combatRoomKey, onCancelButtonClick, onRetryButtonClick } = this.props;
     console.log(isActive);
     return (
       <section className="section is-medium">
@@ -24,7 +24,7 @@ class Auth extends Component {
               <div className="modal-content">
                 {
                   modalType === AUTH ? <ModalAuth onGitHubLoginButtonClick={onGitHubLoginButtonClick} /> :
-                  modalType === MATCHING ? <ModalMatching combatRoomKey={combatRoomKey} onAcceptButtonClick={onAcceptButtonClick} user={matchingUser} stage={matchingStage} message={modalMessage}/>
+                  modalType === MATCHING ? <ModalMatching onRetryButtonClick={onRetryButtonClick} combatRoomKey={combatRoomKey} onCancelButtonClick={onCancelButtonClick} onAcceptButtonClick={onAcceptButtonClick} user={matchingUser} stage={matchingStage} message={modalMessage}/>
                   : null
                 }
               </div>

@@ -7,6 +7,8 @@ import {
   INVITE_MATCH_USER,
   OPPONENT_ACCEPT_MATCH,
   GOT_MATCH_INVITATION,
+  FINDING_FAILURE_OPPONENT_REJECT_COMBAT,
+  FINDING_FAILURE_THERE_IS_NO_ONE,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -71,6 +73,17 @@ function reducer(state = initialState, action) {
         modalType: action.modalType,
         modalMessage: action.modalMessage,
         matchingUser: action.matchingUser,
+        matchingStage: action.matchingStage,
+        combatRoomKey: action.combatRoomKey,
+      });
+    case FINDING_FAILURE_THERE_IS_NO_ONE:
+      return Object.assign({}, state, {
+        modalMessage: action.modalMessage,
+        matchingStage: action.matchingStage,
+      });
+    case FINDING_FAILURE_OPPONENT_REJECT_COMBAT:
+      return Object.assign({}, state, {
+        modalMessage: action.modalMessage,
         matchingStage: action.matchingStage,
         combatRoomKey: action.combatRoomKey,
       });

@@ -8,6 +8,8 @@ import {
   FIND_MATCH_USER_START,
   OPPONENT_ACCEPT_MATCH,
   GOT_MATCH_INVITATION,
+  FINDING_FAILURE_THERE_IS_NO_ONE,
+  FINDING_FAILURE_OPPONENT_REJECT_COMBAT,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -17,6 +19,7 @@ import {
   MATCHING_STAGE_3,
   MATCHING_STAGE_4,
   MATCHING_STAGE_5,
+  MATCHING_STAGE_6,
 } from '../constants/modalTypes';
 import {
   MESSAGE_FIND_MATCH_USER_START,
@@ -98,3 +101,19 @@ export function gotMatchInvitation(user, combatRoomKey) {
   };
 }
 
+export function findingFailureThereIsNoOne() {
+  return {
+    type: FINDING_FAILURE_THERE_IS_NO_ONE,
+    modalMessage: '상대를 찾을 수 없습니다',
+    matchingStage: MATCHING_STAGE_5,
+  }
+}
+
+export function findingFailureOpponentRejectCombat(combatRoomKey) {
+  return {
+    type: FINDING_FAILURE_OPPONENT_REJECT_COMBAT,
+    modalMessage: '상대방이 초대를 거절했습니다.',
+    matchingStage: MATCHING_STAGE_5,
+    combatRoomKey,
+  };
+}
