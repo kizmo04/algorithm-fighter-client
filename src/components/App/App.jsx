@@ -7,11 +7,11 @@ import Modal from '../Modal/Modal';
 
 class App extends Component {
   componentDidMount() {
-    this.props.subscribeInvite();
+    this.props.subscribeSendMatchInvitationEvent();
   }
 
   render() {
-    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, handleOpenAuthModal, handleCloseModal, findingMatchOrLogin, user, matchingStage, matchingUser, emitAcceptance, emitRefuse, combatRoomKey } = this.props;
+    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, handleOpenAuthModal, handleCloseModal, findingMatchOrLogin, user, matchingStage, matchingUser, combatRoomKey, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent } = this.props;
     const { profileImageUrl } = this.props.user;
     return (
       <div className="App">
@@ -21,7 +21,7 @@ class App extends Component {
         </Switch>
         {
           isModalActive ?
-          <Modal onRetryButtonClick={findingMatchOrLogin} combatRoomKey={combatRoomKey} onCancelButtonClick={emitRefuse} onAcceptButtonClick={emitAcceptance} isActive={isModalActive} modalMessage={modalMessage} matchingUser={matchingUser} matchingStage={matchingStage} modalType={modalType} onCloseButtonClick={handleCloseModal} onGitHubLoginButtonClick={authenticateUser} />
+          <Modal onRetryButtonClick={findingMatchOrLogin} combatRoomKey={combatRoomKey} onCancelButtonClick={emitRefuseMatchInvitationEvent} onAcceptButtonClick={emitAcceptMatchInvitationEvent} isActive={isModalActive} modalMessage={modalMessage} matchingUser={matchingUser} matchingStage={matchingStage} modalType={modalType} onCloseButtonClick={handleCloseModal} onGitHubLoginButtonClick={authenticateUser} />
           : null
         }
       </div>

@@ -4,24 +4,32 @@ import AppComponent from '../components/App/App';
 import { signIn as signInGitHub, signOut as signOutGitHub } from '../lib/firebase';
 import jwt from 'jsonwebtoken';
 import { secret } from '../config/jwt';
-import { successUserAuthenticate, logOutUser, openAuthModal, closeModal, openMatchingModal, inviteMatchUser, gotMatchInvitation, findingFailureOpponentRejectCombat, findingFailureThereIsNoOne } from '../actions';
 import { socket } from '../lib/socket';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
+import { 
+  successUserAuthenticate,
+  logOutUser,
+  openAuthModal,
+  closeModal,
+  openMatchingModal,
+  inviteMatchUser,
+  gotMatchInvitation,
+  findingFailureOpponentRejectCombat,
+  findingFailureThereIsNoOne
+} from '../actions';
 import {
-  emitAcceptance, 
-  emitRefuse,
-  subscribeWaitingToAccept,
-  subscribeInvite,
-  subscribeRefuse,
-  subscribeNoOpponent,
+  emitAcceptMatchInvitationEvent,
+  emitRefuseMatchInvitationEvent,
+  subscribePendingMatchAcceptanceEvent,
+  subscribeSendMatchInvitationEvent,
+  subscribeMatchPartnerRefuseMatchInvitationEvent,
+  subscribeMatchPartnerUnavailableEvent,
 } from '../lib/socket';
 import {
   USER_LOGOUT,
   USER_LOGIN,
-  REQUEST_OPPONENT,
-
-
+  FIND_MATCH_PARTNER,
 } from '../constants/socketEventTypes';
 // import { github } from '@fortawesome/free-solid-svg-icons'
 
@@ -77,11 +85,11 @@ const mapDispatchToProps = dispatch => {
           });
         })
         .catch(err => {
-          console.log(err.message)
+          console.log(err.message);
         });
       })
       .catch(err => {
-        console.log(err.message)
+        console.log(err.message);
       });
     },
 
@@ -109,33 +117,34 @@ const mapDispatchToProps = dispatch => {
     },
     findingMatchOrLogin(user, combatRoomKey){
       if (Object.keys(user).length) {
-        socket.emit(REQUEST_OPPONENT, user, combatRoomKey);
+        socket.emit(FIND_MATCH_PARTNER, { hostUser: user, prevCombatRoomKey: combatRoomKey});
         dispatch(openMatchingModal());
-        subscribeWaitingToAccept(user => {
+        subscribePendingMatchAcceptanceEvent(user => {
           dispatch(inviteMatchUser(user));
         });
-        subscribeRefuse(combatRoomKey => {
+        subscribeMatchPartnerRefuseMatchInvitationEvent(combatRoomKey => {
+          console.log('subscribe refuse match invitation')
           dispatch(findingFailureOpponentRejectCombat(combatRoomKey));
         });
-        subscribeNoOpponent(() => {
+        subscribeMatchPartnerUnavailableEvent(() => {
           dispatch(findingFailureThereIsNoOne());
         });
       } else {
         dispatch(openAuthModal());
       }
     },
-    subscribeInvite() {
-      subscribeInvite((hostUser, combatRoomKey) => {
+    subscribeSendMatchInvitationEvent() {
+      subscribeSendMatchInvitationEvent((hostUser, combatRoomKey) => {
         dispatch(gotMatchInvitation(hostUser, combatRoomKey));
       });
     },
-    emitAcceptance({ combatRoomKey, guestUser }) {
-      emitAcceptance(({ combatRoomKey, guestUser }) => {
+    emitAcceptMatchInvitationEvent({ combatRoomKey, guestUser }) {
+      emitAcceptMatchInvitationEvent(({ combatRoomKey, guestUser }) => {
         dispatch(closeModal({ combatRoomKey }));
       }, {combatRoomKey, guestUser});
     },
-    emitRefuse({ combatRoomKey, guestUser }) {
-      emitRefuse(({ combatRoomKey, guestUser }) => {
+    emitRefuseMatchInvitationEvent({ combatRoomKey, guestUser }) {
+      emitRefuseMatchInvitationEvent(({ combatRoomKey, guestUser }) => {
         dispatch(closeModal({ combatRoomKey }));
       }, {combatRoomKey, guestUser});
     },

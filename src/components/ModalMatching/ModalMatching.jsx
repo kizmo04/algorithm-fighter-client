@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 
 class ModalMatching extends Component {
   constructor(props) {
@@ -16,7 +16,6 @@ class ModalMatching extends Component {
   handleCancelButtonClick () {
     const { combatRoomKey, user, onCancelButtonClick } = this.props;
     onCancelButtonClick({ combatRoomKey, guestUser: user });
-
   }
 
   handleRetryButtonClick () {
@@ -39,7 +38,7 @@ class ModalMatching extends Component {
         stage < 3 ? <span className="subtitle is-2">{message}</span> : 
         stage === 3 ? (
           <div>
-            <img src={user.profileImageUrl}/>
+            <img alt="" src={user.profileImageUrl}/>
             <span>{user.email}님과 대결하시겠습니까?</span>
             <button className="button is-small">전투시작</button>
           </div>
