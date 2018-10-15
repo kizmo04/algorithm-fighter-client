@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import "./Modal.scss";
-import { AUTH, MATCHING } from "../../constants/modalTypes";
-import ModalAuth from "../ModalAuth/ModalAuth";
-import ModalMatching from '../ModalMatching/ModalMatching';
+import { AUTH, MATCH } from "../../constants/modalTypes";
+import AuthModal from "../AuthModal/AuthModal";
+import MatchModal from '../MatchModal/MatchModal';
 
-class Auth extends Component {
+class Modal extends Component {
   constructor(props) {
     super(props);
     this.handleOnCloseButtonClick = this.handleOnCloseButtonClick.bind(this);
@@ -14,8 +14,7 @@ class Auth extends Component {
     this.props.onCloseButtonClick();
   }
   render() {
-    const { isActive, modalType, modalMessage, onGitHubLoginButtonClick, matchingStage, matchingUser, onAcceptButtonClick, combatRoomKey, onCancelButtonClick, onRetryButtonClick } = this.props;
-    console.log(isActive);
+    const { isActive, modalType, modalMessage, onGitHubLoginButtonClick, appStage, matchPartner, onAcceptButtonClick, combatRoomKey, onCancelButtonClick, onRetryButtonClick, onChangeMatchingStage, onCloseButtonClick, user } = this.props;
     return (
       <section className="section is-medium">
         <div className="container">
@@ -23,8 +22,8 @@ class Auth extends Component {
             <div className="modal-background"></div>
               <div className="modal-content">
                 {
-                  modalType === AUTH ? <ModalAuth onGitHubLoginButtonClick={onGitHubLoginButtonClick} /> :
-                  modalType === MATCHING ? <ModalMatching onRetryButtonClick={onRetryButtonClick} combatRoomKey={combatRoomKey} onCancelButtonClick={onCancelButtonClick} onAcceptButtonClick={onAcceptButtonClick} user={matchingUser} stage={matchingStage} message={modalMessage}/>
+                  modalType === AUTH ? <AuthModal onCloseButtonClick={onCloseButtonClick} onGitHubLoginButtonClick={onGitHubLoginButtonClick} /> :
+                  modalType === MATCH ? <MatchModal onChangeStage={onChangeMatchingStage} onRetryButtonClick={onRetryButtonClick} combatRoomKey={combatRoomKey} onCloseButtonClick={onCloseButtonClick} onCancelButtonClick={onCancelButtonClick} onAcceptButtonClick={onAcceptButtonClick} user={user} matchPartner={matchPartner} stage={appStage} message={modalMessage}/>
                   : null
                 }
               </div>
@@ -40,4 +39,4 @@ class Auth extends Component {
   }
 }
 
-export default Auth;
+export default Modal;

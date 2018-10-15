@@ -1,22 +1,17 @@
 import React, { Component } from "react";
 import './Main.scss';
-// import { sendResponseGuestUserInfo } from '../../lib/socket';
 
 class Main extends Component {
   constructor(props) {
     super(props);
     this.handleOnClick = this.handleOnClick.bind(this);
   }
-  componentDidMount() {
-    // sendResponseGuestUserInfo(this.props.user);
-  }
 
-  componentWillUnmount() {
-
-  }
   handleOnClick(){
-    this.props.onBattleButtonClick(this.props.user);
+    const { user, token, onBattleButtonClick } = this.props;
+    onBattleButtonClick(token);
   }
+
   render() {
     return (
       <section className="hero is-large is-primary is-bold">

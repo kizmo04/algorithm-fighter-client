@@ -1,14 +1,15 @@
 import {
-  SUCCESS_USER_AUTHENTICATE,
-  LOG_OUT_USER,
-  OPEN_AUTH_MODAL,
-  CLOSE_MODAL,
-  OPEN_MATCHING_MODAL,
-  INVITE_MATCH_USER,
-  OPPONENT_ACCEPT_MATCH,
-  GOT_MATCH_INVITATION,
-  FINDING_FAILURE_OPPONENT_REJECT_COMBAT,
-  FINDING_FAILURE_THERE_IS_NO_ONE,
+  SUCCESS_USER_AUTHENTICATION,
+  USER_LOGOUT,
+  AUTH_MODAL_OPEN,
+  MODAL_CLOSE,
+  MATCH_MODAL_OPEN,
+  PENDING_MATCH_ACCEPTANCE,
+  RECEIVING_MATCH_INVITATION,
+  MATCH_PARTNER_REFUSE_MATCH_INVITATION,
+  MATCH_PARTNER_UNAVAILABLE,
+  ACCEPT_MATCH_INVITATION,
+  REFUSE_MATCH_INVITATION,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -17,74 +18,88 @@ const initialState = {
   isModalActive: false,
   modalType: '',
   modalMessage: '',
-  matchingStage: 0,
-  matchingUser: {},
+  appStage: '',
+  matchPartner: {},
   combatRoomKey: '',
 };
 
 function reducer(state = initialState, action) {
   switch(action.type) {
-    case SUCCESS_USER_AUTHENTICATE:
+    case ACCEPT_MATCH_INVITATION:
+      return Object.assign({}, state, {
+        isModalActive: action.isModalActive,
+        modalType: action.modalType,
+        modalMessage: action.modalMessage,
+        appStage: action.appStage,        
+      });
+    case REFUSE_MATCH_INVITATION:
+      return Object.assign({}, state, {
+        isModalActive: action.isModalActive,
+        modalType: action.modalType,
+        modalMessage: action.modalMessage,
+        appStage: action.appStage,
+      });
+    case SUCCESS_USER_AUTHENTICATION:
       return Object.assign({}, state, {
         token: action.token,
         user: action.user,
         modalType: action.modalType,
         isModalActive: action.isModalActive,
       });
-    case LOG_OUT_USER:
+    case USER_LOGOUT:
       return Object.assign({}, state, {
         token: action.token,
         modalType: action.modalType,
         isModalActive: action.isModalActive,
       });
-    case OPEN_AUTH_MODAL:
+    case AUTH_MODAL_OPEN:
       return Object.assign({}, state, {
         modalType: action.modalType,
         isModalActive: action.isModalActive,
       });
-    case OPEN_MATCHING_MODAL:
+    case MATCH_MODAL_OPEN:
       return Object.assign({}, state, {
         modalType: action.modalType,
         isModalActive: action.isModalActive,
         modalMessage: action.modalMessage,
-        matchingStage: action.matchingStage,
+        appStage: action.appStage,
       });
-    case CLOSE_MODAL:
+    case MODAL_CLOSE:
       return Object.assign({}, state, {
         modalType: action.modalType,
         isModalActive: action.isModalActive,
         modalMessage: action.modalMessage,
       });
-    case INVITE_MATCH_USER:
+    case PENDING_MATCH_ACCEPTANCE:
       return Object.assign({}, state, {
         modalMessage: action.modalMessage,
-        matchingStage: action.matchingStage,
-        matchingUser: action.matchingUser,
+        appStage: action.appStage,
+        matchPartner: action.matchPartner,
       });
-    case OPPONENT_ACCEPT_MATCH:
-      return Object.assign({}, state, {
-        modalMessage: action.modalMessage,
-        matchingUser: action.matchingUser,
-        matchingStage: action.matchingStage,
-      });
-    case GOT_MATCH_INVITATION:
+    // case OPPONENT_ACCEPT_MATCH:
+    //   return Object.assign({}, state, {
+    //     modalMessage: action.modalMessage,
+    //     matchPartner: action.matchPartner,
+    //     appStage: action.appStage,
+    //   });
+    case RECEIVING_MATCH_INVITATION:
       return Object.assign({}, state, {
         isModalActive: action.isModalActive,
         modalType: action.modalType,
         modalMessage: action.modalMessage,
-        matchingUser: action.matchingUser,
-        matchingStage: action.matchingStage,
+        matchPartner: action.matchPartner,
+        appStage: action.appStage,
         combatRoomKey: action.combatRoomKey,
       });
-    case FINDING_FAILURE_THERE_IS_NO_ONE:
+    case MATCH_PARTNER_UNAVAILABLE:
       return Object.assign({}, state, {
         modalMessage: action.modalMessage,
-        matchingStage: action.matchingStage,
+        appStage: action.appStage,
       });
-    case FINDING_FAILURE_OPPONENT_REJECT_COMBAT:
+    case MATCH_PARTNER_REFUSE_MATCH_INVITATION:
       return Object.assign({}, state, {
         modalMessage: action.modalMessage,
-        matchingStage: action.matchingStage,
+        appStage: action.appStage,
         combatRoomKey: action.combatRoomKey,
       });
     default:

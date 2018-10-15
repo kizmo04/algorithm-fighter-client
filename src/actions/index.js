@@ -1,33 +1,36 @@
 import {
-  SUCCESS_USER_AUTHENTICATE,
-  LOG_OUT_USER,
-  OPEN_AUTH_MODAL,
-  CLOSE_MODAL,
-  OPEN_MATCHING_MODAL,
-  INVITE_MATCH_USER,
-  FIND_MATCH_USER_START,
-  OPPONENT_ACCEPT_MATCH,
-  GOT_MATCH_INVITATION,
-  FINDING_FAILURE_THERE_IS_NO_ONE,
-  FINDING_FAILURE_OPPONENT_REJECT_COMBAT,
+  SUCCESS_USER_AUTHENTICATION,
+  USER_LOGOUT,
+  AUTH_MODAL_OPEN,
+  MODAL_CLOSE,
+  MATCH_MODAL_OPEN,
+  PENDING_MATCH_ACCEPTANCE,
+  RECEIVING_MATCH_INVITATION,
+  MATCH_PARTNER_UNAVAILABLE,
+  MATCH_PARTNER_REFUSE_MATCH_INVITATION,
+  REFUSE_MATCH_INVITATION,
+  ACCEPT_MATCH_INVITATION,
 } from '../constants/actionTypes';
 import {
   AUTH,
-  MATCHING,
-  MATCHING_STAGE_1,
-  MATCHING_STAGE_2,
-  MATCHING_STAGE_3,
-  MATCHING_STAGE_4,
-  MATCHING_STAGE_5,
-  MATCHING_STAGE_6,
+  MATCH,
+  APP_STAGE_FIND_MATCH_PARTNER,
+  APP_STAGE_PENDING_MATCH_ACCEPTANCE,
+  APP_STAGE_RECEIVING_MATCH_INVITATION,
+  APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
+  APP_STAGE_MATCH_PARTNER_UNAVAILABLE,
+  APP_STAGE_REFUSE_MATCH_INVITATION,
+  APP_STAGE_ACCEPT_MATCH_INVITATION,
 } from '../constants/modalTypes';
 import {
-  MESSAGE_FIND_MATCH_USER_START,
+  MESSAGE_FIND_MATCH_PARTNER,
+  MESSAGE_MATCH_PARTNER_UNAVAILABLE,
+  MESSAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
 } from '../constants/messages';
 
-export function successUserAuthenticate(token, user) {
+export function successUserAuthentication(token, user) {
   return {
-    type: SUCCESS_USER_AUTHENTICATE,
+    type: SUCCESS_USER_AUTHENTICATION,
     token,
     user,
     isModalActive: false,
@@ -35,85 +38,105 @@ export function successUserAuthenticate(token, user) {
   };
 }
 
-export function logOutUser() {
+export function userLogout() {
   return {
-    type: LOG_OUT_USER,
+    type: USER_LOGOUT,
     token: '',
     isModalActive: false,
     modalType: '',
   };
 }
 
-export function openAuthModal() {
+export function authModalOpen() {
   return {
-    type: OPEN_AUTH_MODAL,
+    type: AUTH_MODAL_OPEN,
     isModalActive: true,
     modalType: AUTH,
   };
 }
 
-export function closeModal() {
+export function modalClose() {
   return {
-    type: CLOSE_MODAL,
+    type: MODAL_CLOSE,
     isModalActive: false,
     modalType: '',
     modalMessage: '',
   };
 }
 
-export function openMatchingModal() {
+export function refuseMatchInvitation() {
   return {
-    type: OPEN_MATCHING_MODAL,
+    type: REFUSE_MATCH_INVITATION,
+    isModalActive: false,
+    modalType: '',
+    modalMessage: '',
+    appStage: APP_STAGE_REFUSE_MATCH_INVITATION,
+  };
+}
+
+export function acceptMatchInvitation() {
+  return {
+    type: ACCEPT_MATCH_INVITATION,
+    isModalActive: false,
+    modalType: '',
+    modalMessage: '',
+    appStage: APP_STAGE_ACCEPT_MATCH_INVITATION,
+  };
+}
+
+export function matchModalOpen() {
+  return {
+    type: MATCH_MODAL_OPEN,
     isModalActive: true,
-    modalType: MATCHING,
-    modalMessage: MESSAGE_FIND_MATCH_USER_START,
-    matchingStage: MATCHING_STAGE_1,
+    modalType: MATCH,
+    modalMessage: MESSAGE_FIND_MATCH_PARTNER,
+    appStage: APP_STAGE_FIND_MATCH_PARTNER,
   };
 }
 
-export function inviteMatchUser(user) {
+export function pendingMatchAcceptance(matchPartner) {
   return {
-    type: INVITE_MATCH_USER,
-    modalMessage: `${user.email}님의 수락을 기다리는 중 입니다`,
-    matchingStage: MATCHING_STAGE_2,
-    matchingUser: user,
+    type: PENDING_MATCH_ACCEPTANCE,
+    modalMessage: `${matchPartner.email}님의 수락을 기다리는 중 입니다`,
+    appStage: APP_STAGE_PENDING_MATCH_ACCEPTANCE,
+    matchPartner,
   };
 }
 
-export function opponentAcceptMatch(user) {
-  return {
-    type: OPPONENT_ACCEPT_MATCH,
-    modalMessage: `${user.email}이 대결을 수락했습니다. 잠시만 기다려주세요.`,
-    matchingStage: MATCHING_STAGE_3,
-    matchingUser: user,
-  };
-}
+// export function opponentAcceptMatch(user) {
+//   return {
+//     type: OPPONENT_ACCEPT_MATCH,
+//     modalMessage: `${user.email}이 대결을 수락했습니다. 잠시만 기다려주세요.`,
+//     appStage: APP_STAGE_3,
+//     matchPartner: user,
+//   };
+// }
 
-export function gotMatchInvitation(user, combatRoomKey) {
+export function receivingMatchInvitation(matchPartner, combatRoomKey) {
   return {
-    type: GOT_MATCH_INVITATION,
+    type: RECEIVING_MATCH_INVITATION,
     isModalActive: true,
-    modalType: MATCHING,
-    modalMessage: `${user.email}님이 초대를 보냈습니다. 수락하시겠습니까?`,
-    matchingStage: MATCHING_STAGE_4,
-    matchingUser: user,
+    modalType: MATCH,
+    modalMessage: `${matchPartner.email}님이 초대를 보냈습니다. 수락하시겠습니까?`,
+    appStage: APP_STAGE_RECEIVING_MATCH_INVITATION,
+    matchPartner,
     combatRoomKey,
   };
 }
 
-export function findingFailureThereIsNoOne() {
+export function matchPartnerUnavailable() {
   return {
-    type: FINDING_FAILURE_THERE_IS_NO_ONE,
-    modalMessage: '상대를 찾을 수 없습니다',
-    matchingStage: MATCHING_STAGE_5,
+    type: MATCH_PARTNER_UNAVAILABLE,
+    modalMessage: MESSAGE_MATCH_PARTNER_UNAVAILABLE,
+    appStage: APP_STAGE_MATCH_PARTNER_UNAVAILABLE,
   }
 }
 
-export function findingFailureOpponentRejectCombat(combatRoomKey) {
+export function matchPartnerRefuseMatchInvitation(combatRoomKey) {
   return {
-    type: FINDING_FAILURE_OPPONENT_REJECT_COMBAT,
-    modalMessage: '상대방이 초대를 거절했습니다.',
-    matchingStage: MATCHING_STAGE_5,
+    type: MATCH_PARTNER_REFUSE_MATCH_INVITATION,
+    modalMessage: MESSAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
+    appStage: APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
     combatRoomKey,
   };
 }

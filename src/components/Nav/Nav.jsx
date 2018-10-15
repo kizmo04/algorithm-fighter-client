@@ -12,8 +12,8 @@ class Nav extends Component {
     this.props.onLogoutButtonClick();
   }
   handleOnLoginButtonClick() {
-    console.log("click!!!");
-    this.props.onLoginButtonClick();
+    const { user, onLoginButtonClick } = this.props;
+    onLoginButtonClick();
   }
   render() {
     const { token, imageUrl } = this.props;

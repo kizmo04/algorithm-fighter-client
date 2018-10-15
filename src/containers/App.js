@@ -1,37 +1,42 @@
-import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import AppComponent from '../components/App/App';
 import { signIn as signInGitHub, signOut as signOutGitHub } from '../lib/firebase';
 import jwt from 'jsonwebtoken';
-import { secret } from '../config/jwt';
-import { socket } from '../lib/socket';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
-import { 
-  successUserAuthenticate,
-  logOutUser,
-  openAuthModal,
-  closeModal,
-  openMatchingModal,
-  inviteMatchUser,
-  gotMatchInvitation,
-  findingFailureOpponentRejectCombat,
-  findingFailureThereIsNoOne
+import {
+  successUserAuthentication,
+  userLogout,
+  authModalOpen,
+  matchModalOpen,
+  modalClose,
+  pendingMatchAcceptance,
+  receivingMatchInvitation,
+  matchPartnerRefuseMatchInvitation,
+  matchPartnerUnavailable,
+  refuseMatchInvitation,
+  acceptMatchInvitation,
 } from '../actions';
 import {
-  emitAcceptMatchInvitationEvent,
-  emitRefuseMatchInvitationEvent,
   subscribePendingMatchAcceptanceEvent,
   subscribeSendMatchInvitationEvent,
   subscribeMatchPartnerRefuseMatchInvitationEvent,
   subscribeMatchPartnerUnavailableEvent,
+  unsubscribePendingMatchAcceptanceEvent,
+  unsubscribeSendMatchInvitationEvent,
+  unsubscribeMatchPartnerRefuseMatchInvitationEvent,
+  unsubscribeMatchPartnerUnavailableEvent,
+  emitAcceptMatchInvitationEvent,
+  emitRefuseMatchInvitationEvent,
+  emitFindMatchPartnerEvent,
+  emitFindMatchPartnerEndEvent,
+  emitUserLoginEvent,
+  emitUserLogoutEvent,
 } from '../lib/socket';
-import {
-  USER_LOGOUT,
-  USER_LOGIN,
-  FIND_MATCH_PARTNER,
-} from '../constants/socketEventTypes';
-// import { github } from '@fortawesome/free-solid-svg-icons'
+import { MATCH } from '../constants/modalTypes';
+import { config } from '../config';
+
+const { JWT_SECRET, ROOT } = config;
 
 library.add(fab);
 
@@ -44,7 +49,7 @@ const mapDispatchToProps = dispatch => {
       .then(result => {
         const { email, displayName, photoURL} = result.user;
         const { bio, login } = result.additionalUserInfo.profile;
-        fetch('http://localhost:5000/api/auth', {
+        fetch(`${ROOT}/api/auth`, {
           method: "POST",
           mode: "cors",
           headers: {
@@ -55,7 +60,7 @@ const mapDispatchToProps = dispatch => {
             name: displayName,
             user_name: login,
             short_bio: bio,
-            profile_image_url: photoURL
+            profile_image_url: photoURL,
           })
         })
         .then(response => {
@@ -67,7 +72,7 @@ const mapDispatchToProps = dispatch => {
         })
         .then(body => {
           const { token } = body;
-          jwt.verify(token, secret, function(err, decoded) {
+          jwt.verify(token, JWT_SECRET, function(err, decoded) {
             if (err) {
               console.log(err);
             }
@@ -77,11 +82,9 @@ const mapDispatchToProps = dispatch => {
               userName,
               profileImageUrl,
               email,
-              shortBio
+              shortBio,
             };
-            dispatch(successUserAuthenticate(token, user));
-            // const socket = io('http://localhost:5000/waiting', { transports: ['websocket']});
-            socket.emit(USER_LOGIN, user);
+            dispatch(successUserAuthentication(token, user));
           });
         })
         .catch(err => {
@@ -92,61 +95,80 @@ const mapDispatchToProps = dispatch => {
         console.log(err.message);
       });
     },
-
     logoutUser() {
       signOutGitHub()
       .then(() => {
-        dispatch(logOutUser());
-        socket.emit(USER_LOGOUT);
+        dispatch(userLogout());
       })
       .catch(err => {
         console.log(err);
       })
     },
-
-    getUserInfo(token) {
-
+    closeModal() {
+      dispatch(modalClose());
     },
-
-    handleOpenAuthModal() {
-      dispatch(openAuthModal());
-    },
-
-    handleCloseModal() {
-      dispatch(closeModal());
-    },
-    findingMatchOrLogin(user, combatRoomKey){
-      if (Object.keys(user).length) {
-        socket.emit(FIND_MATCH_PARTNER, { hostUser: user, prevCombatRoomKey: combatRoomKey});
-        dispatch(openMatchingModal());
-        subscribePendingMatchAcceptanceEvent(user => {
-          dispatch(inviteMatchUser(user));
-        });
-        subscribeMatchPartnerRefuseMatchInvitationEvent(combatRoomKey => {
-          console.log('subscribe refuse match invitation')
-          dispatch(findingFailureOpponentRejectCombat(combatRoomKey));
-        });
-        subscribeMatchPartnerUnavailableEvent(() => {
-          dispatch(findingFailureThereIsNoOne());
-        });
+    openModal(type, token){
+      if (type === MATCH && token) {
+        dispatch(matchModalOpen());
       } else {
-        dispatch(openAuthModal());
+        dispatch(authModalOpen());
       }
+    },
+    refuseMatchInvitation() {
+      dispatch(refuseMatchInvitation());
+    },
+    acceptMatchInvitation() {
+      dispatch(acceptMatchInvitation());
+    },
+    subscribeMatchPartnerUnavailableEvent() {
+      subscribeMatchPartnerUnavailableEvent(() => {
+        dispatch(matchPartnerUnavailable());
+      });
+    },
+    subscribeMatchPartnerRefuseMatchInvitationEvent() {
+      subscribeMatchPartnerRefuseMatchInvitationEvent(combatRoomKey => {
+        dispatch(matchPartnerRefuseMatchInvitation(combatRoomKey));
+      });
+    },
+    subscribePendingMatchAcceptanceEvent() {
+      subscribePendingMatchAcceptanceEvent(matchPartner => {
+        dispatch(pendingMatchAcceptance(matchPartner));
+      });
     },
     subscribeSendMatchInvitationEvent() {
       subscribeSendMatchInvitationEvent((hostUser, combatRoomKey) => {
-        dispatch(gotMatchInvitation(hostUser, combatRoomKey));
+        dispatch(receivingMatchInvitation(hostUser, combatRoomKey));
       });
     },
-    emitAcceptMatchInvitationEvent({ combatRoomKey, guestUser }) {
-      emitAcceptMatchInvitationEvent(({ combatRoomKey, guestUser }) => {
-        dispatch(closeModal({ combatRoomKey }));
-      }, {combatRoomKey, guestUser});
+    unsubscribePendingMatchAcceptanceEvent() {
+      unsubscribePendingMatchAcceptanceEvent();
     },
-    emitRefuseMatchInvitationEvent({ combatRoomKey, guestUser }) {
-      emitRefuseMatchInvitationEvent(({ combatRoomKey, guestUser }) => {
-        dispatch(closeModal({ combatRoomKey }));
-      }, {combatRoomKey, guestUser});
+    unsubscribeSendMatchInvitationEvent() {
+      unsubscribeSendMatchInvitationEvent();
+    },
+    unsubscribeMatchPartnerRefuseMatchInvitationEvent() {
+      unsubscribeMatchPartnerRefuseMatchInvitationEvent();
+    },
+    unsubscribeMatchPartnerUnavailableEvent() {
+      unsubscribeMatchPartnerUnavailableEvent();
+    },
+    emitFindMatchPartnerEvent(user, combatRoomKey) {
+      emitFindMatchPartnerEvent({ hostUser: user, prevCombatRoomKey: combatRoomKey });
+    },
+    emitAcceptMatchInvitationEvent(combatRoomKey, guestUser) {
+      emitAcceptMatchInvitationEvent(combatRoomKey, guestUser);
+    },
+    emitRefuseMatchInvitationEvent(combatRoomKey, guestUser) {
+      emitRefuseMatchInvitationEvent(combatRoomKey, guestUser);
+    },
+    emitUserLoginEvent(user){
+      emitUserLoginEvent(user);
+    },
+    emitUserLogoutEvent() {
+      emitUserLogoutEvent();
+    },
+    emitFindMatchPartnerEndEvent(combatRoomKey) {
+      emitFindMatchPartnerEndEvent(combatRoomKey);
     },
   };
 };

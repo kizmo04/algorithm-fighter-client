@@ -1,11 +1,20 @@
 import React, { Component } from "react";
+import {
+  APP_STAGE_FIND_MATCH_PARTNER,
+  APP_STAGE_PENDING_MATCH_ACCEPTANCE,
+  APP_STAGE_RECEIVING_MATCH_INVITATION,
+  APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
+  APP_STAGE_MATCH_PARTNER_UNAVAILABLE,
+} from '../../constants/modalTypes';
 
-class ModalMatching extends Component {
+
+class MatchModal extends Component {
   constructor(props) {
     super(props);
     this.handleAcceptButtonClick = this.handleAcceptButtonClick.bind(this);
     this.handleCancelButtonClick = this.handleCancelButtonClick.bind(this);
     this.handleRetryButtonClick = this.handleRetryButtonClick.bind(this);
+    this.handleOnCloseButtonClick = this.handleOnCloseButtonClick.bind(this);
   }
 
   handleAcceptButtonClick () {
@@ -23,34 +32,31 @@ class ModalMatching extends Component {
     onRetryButtonClick(user, combatRoomKey);
   }
 
-
+  handleOnCloseButtonClick() {
+    const { onCloseButtonClick } = this.props;
+    onCloseButtonClick();
+  }
 
   render() {
-    const { message, stage, user } = this.props;
+    const { message, stage, matchPartner } = this.props;
     return (
       <div className="modal-card">
       <header className="modal-card-head">
         <p className="modal-card-title is-2 is-spaced">매칭 중</p>
-        <button className="delete" aria-label="close"></button>
+        <button onClick={this.handleOnCloseButtonClick} className="delete" aria-label="close"></button>
       </header>
       <section className="modal-card-body">
       {
-        stage < 3 ? <span className="subtitle is-2">{message}</span> : 
-        stage === 3 ? (
+        stage === APP_STAGE_FIND_MATCH_PARTNER || stage === APP_STAGE_PENDING_MATCH_ACCEPTANCE ? <span className="subtitle is-2">{message}</span> :
+        stage === APP_STAGE_RECEIVING_MATCH_INVITATION ? (
           <div>
-            <img alt="" src={user.profileImageUrl}/>
-            <span>{user.email}님과 대결하시겠습니까?</span>
-            <button className="button is-small">전투시작</button>
-          </div>
-        ) :
-        stage === 4 ? (
-          <div>
-            <span>{message}</span>
+            <img alt="" src={matchPartner.profileImageUrl}/>
+            <span>{matchPartner.email}님과 대결하시겠습니까?</span>
             <button className="button is-small" onClick={this.handleAcceptButtonClick}>수락</button>
             <button className="button is-small" onClick={this.handleCancelButtonClick}>거절</button>
           </div>
         ) :
-        stage === 5 ? (
+        stage === APP_STAGE_MATCH_PARTNER_UNAVAILABLE || stage === APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION ? (
           <div>
             <span>{message}</span>
             <button className="button is-small" onClick={this.handleRetryButtonClick}>다시 찾기</button>
@@ -65,4 +71,4 @@ class ModalMatching extends Component {
   }
 }
 
-export default ModalMatching;
+export default MatchModal;

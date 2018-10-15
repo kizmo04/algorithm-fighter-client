@@ -1,14 +1,19 @@
 import React, { Component, Fragment } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-class ModalAuth extends Component {
+class AuthModal extends Component {
   constructor(props) {
     super(props);
     this.handleOnGitHubLoginButtonClick = this.handleOnGitHubLoginButtonClick.bind(this);
+    this.handleOnCloseButtonClick = this.handleOnCloseButtonClick.bind(this);
   }
 
   handleOnGitHubLoginButtonClick() {
     this.props.onGitHubLoginButtonClick();
+  }
+
+  handleOnCloseButtonClick() {
+    this.props.onCloseButtonClick();
   }
 
   render() {
@@ -16,7 +21,7 @@ class ModalAuth extends Component {
       <div className="modal-card">
         <header className="modal-card-head">
           <p className="modal-card-title is-2 is-spaced">access algorithm fighter with github</p>
-          <button className="delete" aria-label="close"></button>
+          <button onClick={this.handleOnCloseButtonClick} className="delete" aria-label="close"></button>
         </header>
         <section className="modal-card-body">
           <button
@@ -36,4 +41,4 @@ class ModalAuth extends Component {
   }
 }
 
-export default ModalAuth;
+export default AuthModal;
