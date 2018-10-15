@@ -9,6 +9,8 @@
     "@fortawesome/react-fontawesome": "^0.1.3",
     "bulma": "^0.7.1",
     "connected-react-router": "^4.5.0",
+    "dotenv": "^6.1.0",
+    "dotenv-expand": "^4.2.0",
     "firebase": "^5.5.3",
     "i": "^0.3.6",
     "jsonwebtoken": "^8.3.0",
@@ -25,7 +27,7 @@
     "socket.io-client": "^2.1.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "NODE_ENV=development react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

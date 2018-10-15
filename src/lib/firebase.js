@@ -1,6 +1,7 @@
 import firebase from 'firebase';
-import { firebaseConfig } from '../config/firebase';
+import { config } from '../config';
 
+const { firebaseConfig } = config;
 firebase.initializeApp(firebaseConfig);
 
 const provider = new firebase.auth.GithubAuthProvider();
