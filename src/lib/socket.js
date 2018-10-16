@@ -7,11 +7,16 @@ import {
   MATCH_PARTNER_ENTERED,
   MATCH_PARTNER_UNAVAILABLE,
   MATCH_PARTNER_REFUSE_MATCH_INVITATION,
-  RECALL_MATCHING_STATUS,
   FIND_MATCH_PARTNER,
   FIND_MATCH_PARTNER_END,
   USER_LOGOUT,
   USER_LOGIN,
+  SEND_RANDOM_PROBLEM,
+  MATCH_START,
+  KEY_PRESS,
+  MATCH_PARTNER_KEY_PRESS,
+  MATCH_PARTNER_SUBMIT_SOLUTION,
+  SUBMIT_SOLUTION,
 } from '../constants/socketEventTypes';
 import { config } from '../config';
 
@@ -21,7 +26,7 @@ const socket = io(ROOT);
 
 const eventListenersMap = {};
 
-socket.on(MATCH_PARTNER_ENTERED, ({hostUser, combatRoomKey, guestSocketId, hostSocketId, guestUser, participants}) => {
+// socket.on(MATCH_PARTNER_ENTERED, ({hostUser, combatRoomKey, guestSocketId, hostSocketId, guestUser, participants}) => {
   // 안내 메세지 현재 두 클라이언트가 같은 room 에 join한 시점
   // GET random problem (host id, guest id 필요),
   // 문제를 받으면 client emit ('READY_TO_FIGHT', user) - 각자 user 정보 보내줌
@@ -30,7 +35,7 @@ socket.on(MATCH_PARTNER_ENTERED, ({hostUser, combatRoomKey, guestSocketId, hostS
   // client on ('MATCH_STARTED', ({ user2, match_id }) => /match/match_id 문제풀이 화면으로 넘어가기
   // 문제풀이 화면에는 두 유저의 정보와 에디터
   // 문제 풀이 시작하면서 발생하는 이벤트 : keyboard typing, submit solution and display progress bar, 패배 승리
-});
+// });
 
 // 한명이 승리한 경우
 // socket.emit('winning')
@@ -55,9 +60,66 @@ socket.on(MATCH_PARTNER_ENTERED, ({hostUser, combatRoomKey, guestSocketId, hostS
 // 이것은 소켓이벤트 말고 각자 처리?
 // 혹은 서버에서 타이머를 돌리고 소켓 클라이언트들이 받아서 보여줌
 // 타이머 종료되면 서버에서 종료메세지 띄움.
+export function subscribeMatchPartnerSubmitSolutionEvent(cb) {
+  const matchPartnerSubmitSolutionEventListener = () => {
+    cb();
+  };
+
+  eventListenersMap[MATCH_PARTNER_SUBMIT_SOLUTION] = matchPartnerSubmitSolutionEventListener;
+  
+  socket.on(MATCH_PARTNER_SUBMIT_SOLUTION, matchPartnerSubmitSolutionEventListener)
+
+}
+
+export function subscribeMatchPartnerKeyPressEvent(cb) {
+  const matchPartnerKeyPressEventListener = isMatchPartnerKeyPress => {
+    cb(isMatchPartnerKeyPress);
+  };
+
+  eventListenersMap[MATCH_PARTNER_KEY_PRESS] = matchPartnerKeyPressEventListener;
+
+  socket.on(MATCH_PARTNER_KEY_PRESS, matchPartnerKeyPressEventListener);
+}
+
+export function emitKeyPressEvent(val) {
+  socket.emit(KEY_PRESS, val);
+}
+
+export function subscribeMatchStartEvent(cb) {
+  const matchStartEventListener = problem => {
+    console.log('in match start on!')
+    cb(problem);
+  };
+
+  eventListenersMap[MATCH_START] = matchStartEventListener;
+
+  socket.on(MATCH_START, matchStartEventListener);
+}
+
+export function emitSendRandomProblemEvent(problem, combatRoomKey) {
+  console.log('send problem: ', problem)
+  socket.emit(SEND_RANDOM_PROBLEM, problem, combatRoomKey);
+}
+
+export function subscribeMatchPartnerEnteredEvent(cb) {
+  const matchPartnerEnteredEventListener = (matchPartner, combatRoomKey) => {
+    console.log('match partner entered', combatRoomKey)
+    cb(matchPartner, combatRoomKey);
+  };
+
+  eventListenersMap[MATCH_PARTNER_ENTERED] = matchPartnerEnteredEventListener;
+
+  socket.on(MATCH_PARTNER_ENTERED, matchPartnerEnteredEventListener);
+}
+
+export function unsubscribeMatchPartnerEnteredEvent() {
+  if (eventListenersMap[MATCH_PARTNER_ENTERED]) {
+    socket.off(MATCH_PARTNER_ENTERED, eventListenersMap[MATCH_PARTNER_ENTERED]);
+  }
+}
 
 export function subscribePendingMatchAcceptanceEvent(cb) {
-  const pendingMatchAcceptanceEventListener = (guestUser) => {
+  const pendingMatchAcceptanceEventListener = guestUser => {
     cb(guestUser);
   };
 
@@ -73,7 +135,7 @@ export function unsubscribePendingMatchAcceptanceEvent() {
 }
 
 export function subscribeSendMatchInvitationEvent(cb) {
-  const sendMatchInvitationEventListener = ({ hostUser, combatRoomKey }) => {
+  const sendMatchInvitationEventListener = (hostUser, combatRoomKey) => {
     cb(hostUser, combatRoomKey);
   };
 
@@ -119,19 +181,19 @@ export function unsubscribeMatchPartnerUnavailableEvent() {
 }
 
 export function emitFindMatchPartnerEvent(hostUser, prevCombatRoomKey) {
-  socket.emit(FIND_MATCH_PARTNER, { hostUser, prevCombatRoomKey });
+  socket.emit(FIND_MATCH_PARTNER, hostUser, prevCombatRoomKey);
 }
 
 export function emitFindMatchPartnerEndEvent(combatRoomKey) {
   socket.emit(FIND_MATCH_PARTNER_END, combatRoomKey);
 }
 
-export function emitAcceptMatchInvitationEvent(combatRoomKey, guestUser) {
-  socket.emit(ACCEPT_MATCH_INVITATION, {combatRoomKey, guestUser});
+export function emitAcceptMatchInvitationEvent(combatRoomKey, matchPartner) {
+  socket.emit(ACCEPT_MATCH_INVITATION, combatRoomKey, matchPartner);
 }
 
 export function emitRefuseMatchInvitationEvent(combatRoomKey, guestUser) {
-  socket.emit(REFUSE_MATCH_INVITATION, {combatRoomKey, guestUser});
+  socket.emit(REFUSE_MATCH_INVITATION, combatRoomKey, guestUser);
 }
 
 export function emitUserLoginEvent(user) {

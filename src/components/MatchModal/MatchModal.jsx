@@ -38,7 +38,7 @@ class MatchModal extends Component {
   }
 
   render() {
-    const { message, stage, matchPartner } = this.props;
+    const { modalMessage, appStage, matchPartner } = this.props;
     return (
       <div className="modal-card">
       <header className="modal-card-head">
@@ -47,8 +47,8 @@ class MatchModal extends Component {
       </header>
       <section className="modal-card-body">
       {
-        stage === APP_STAGE_FIND_MATCH_PARTNER || stage === APP_STAGE_PENDING_MATCH_ACCEPTANCE ? <span className="subtitle is-2">{message}</span> :
-        stage === APP_STAGE_RECEIVING_MATCH_INVITATION ? (
+        appStage === APP_STAGE_FIND_MATCH_PARTNER || appStage === APP_STAGE_PENDING_MATCH_ACCEPTANCE ? <span className="subtitle is-2">{modalMessage}</span> :
+        appStage === APP_STAGE_RECEIVING_MATCH_INVITATION ? (
           <div>
             <img alt="" src={matchPartner.profileImageUrl}/>
             <span>{matchPartner.email}님과 대결하시겠습니까?</span>
@@ -56,9 +56,9 @@ class MatchModal extends Component {
             <button className="button is-small" onClick={this.handleCancelButtonClick}>거절</button>
           </div>
         ) :
-        stage === APP_STAGE_MATCH_PARTNER_UNAVAILABLE || stage === APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION ? (
+        appStage === APP_STAGE_MATCH_PARTNER_UNAVAILABLE || appStage === APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION ? (
           <div>
-            <span>{message}</span>
+            <span>{modalMessage}</span>
             <button className="button is-small" onClick={this.handleRetryButtonClick}>다시 찾기</button>
           </div>
         ) : null

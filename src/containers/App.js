@@ -16,12 +16,17 @@ import {
   matchPartnerUnavailable,
   refuseMatchInvitation,
   acceptMatchInvitation,
+  matchProblemFetched,
+  matchPreparation,
+  matchStarted,
 } from '../actions';
 import {
   subscribePendingMatchAcceptanceEvent,
   subscribeSendMatchInvitationEvent,
   subscribeMatchPartnerRefuseMatchInvitationEvent,
   subscribeMatchPartnerUnavailableEvent,
+  subscribeMatchPartnerEnteredEvent,
+  subscribeMatchStartEvent,
   unsubscribePendingMatchAcceptanceEvent,
   unsubscribeSendMatchInvitationEvent,
   unsubscribeMatchPartnerRefuseMatchInvitationEvent,
@@ -32,6 +37,7 @@ import {
   emitFindMatchPartnerEndEvent,
   emitUserLoginEvent,
   emitUserLogoutEvent,
+  emitSendRandomProblemEvent,
 } from '../lib/socket';
 import { MATCH } from '../constants/modalTypes';
 import { config } from '../config';
@@ -76,8 +82,9 @@ const mapDispatchToProps = dispatch => {
             if (err) {
               console.log(err);
             }
-            const { name, userName, profileImageUrl, email, shortBio } = decoded;
+            const { _id, name, userName, profileImageUrl, email, shortBio } = decoded;
             const user = {
+              _id,
               name,
               userName,
               profileImageUrl,
@@ -103,6 +110,23 @@ const mapDispatchToProps = dispatch => {
       .catch(err => {
         console.log(err);
       })
+    },
+    async fetchRandomProblem(userIdOrProblemId, matchPartnerId) {
+      try {
+        let problem;
+        if (matchPartnerId) {
+          const response = await fetch(`${ROOT}/api/problems/random?u_id=${userIdOrProblemId}&p_id=${matchPartnerId}`);
+          const body = await response.json();
+          problem = body.problem;
+        } else {
+          const response = await fetch(`${ROOT}/api/problems/${userIdOrProblemId}`);
+          const body = await response.json();
+          problem = body.problem;
+        }
+        dispatch(matchProblemFetched(problem));
+      } catch(err) {
+        console.log(err);
+      }
     },
     closeModal() {
       dispatch(modalClose());
@@ -140,6 +164,16 @@ const mapDispatchToProps = dispatch => {
         dispatch(receivingMatchInvitation(hostUser, combatRoomKey));
       });
     },
+    subscribeMatchPartnerEnteredEvent() {
+      subscribeMatchPartnerEnteredEvent((matchPartner, combatRoomKey) => {
+        dispatch(matchPreparation(matchPartner, combatRoomKey));
+      });
+    },
+    subscribeMatchStartEvent() {
+      subscribeMatchStartEvent(problem => {
+        dispatch(matchStarted(problem));
+      });
+    },
     unsubscribePendingMatchAcceptanceEvent() {
       unsubscribePendingMatchAcceptanceEvent();
     },
@@ -169,6 +203,9 @@ const mapDispatchToProps = dispatch => {
     },
     emitFindMatchPartnerEndEvent(combatRoomKey) {
       emitFindMatchPartnerEndEvent(combatRoomKey);
+    },
+    emitSendRandomProblemEvent(problem, combatRoomKey) {
+      emitSendRandomProblemEvent(problem, combatRoomKey);
     },
   };
 };

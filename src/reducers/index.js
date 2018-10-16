@@ -10,6 +10,11 @@ import {
   MATCH_PARTNER_UNAVAILABLE,
   ACCEPT_MATCH_INVITATION,
   REFUSE_MATCH_INVITATION,
+  MATCH_STARTED,
+  MATCH_PREPARATION,
+  MATCH_PROBLEM_FETCHED,
+  MATCH_PARTNER_KEY_PRESS,
+  INIT_MATCH_PARTNER_KEY_PRESS,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -21,6 +26,10 @@ const initialState = {
   appStage: '',
   matchPartner: {},
   combatRoomKey: '',
+  problem: {},
+  isMatchStarted: false,
+  isMatchPartnerKeyPress: false,
+  matchMessage: '',
 };
 
 function reducer(state = initialState, action) {
@@ -30,7 +39,7 @@ function reducer(state = initialState, action) {
         isModalActive: action.isModalActive,
         modalType: action.modalType,
         modalMessage: action.modalMessage,
-        appStage: action.appStage,        
+        appStage: action.appStage,
       });
     case REFUSE_MATCH_INVITATION:
       return Object.assign({}, state, {
@@ -101,6 +110,38 @@ function reducer(state = initialState, action) {
         modalMessage: action.modalMessage,
         appStage: action.appStage,
         combatRoomKey: action.combatRoomKey,
+      });
+    case MATCH_STARTED:
+      return Object.assign({}, state, {
+        appStage: action.appStage,
+        problem: action.problem,
+        isModalActive: action.isModalActive,
+        modalMessage: action.modalMessage,
+        modalType: action.modalType,
+        isMatchStarted: action.isMatchStarted,
+      });
+    case MATCH_PREPARATION:
+      return Object.assign({}, state, {
+        appStage: action.appStage,
+        modalMessage: action.modalMessage,
+        matchPartner: action.matchPartner,
+        combatRoomKey: action.combatRoomKey,
+      });
+    case MATCH_PROBLEM_FETCHED:
+      return Object.assign({}, state, {
+        appStage: action.appStage,
+        modalMessage: action.modalMessage,
+        problem: action.problem,
+      });
+    case MATCH_PARTNER_KEY_PRESS:
+      return Object.assign({}, state, {
+        matchMessage: action.matchMessage,
+        isMatchPartnerKeyPress: action.isMatchPartnerKeyPress
+      });
+    case INIT_MATCH_PARTNER_KEY_PRESS:
+      return Object.assign({}, state, {
+        matchMessage: action.matchMessage,
+        isMatchPartnerKeyPress: action.isMatchPartnerKeyPress,
       });
     default:
       return state;

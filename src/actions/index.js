@@ -10,6 +10,11 @@ import {
   MATCH_PARTNER_REFUSE_MATCH_INVITATION,
   REFUSE_MATCH_INVITATION,
   ACCEPT_MATCH_INVITATION,
+  MATCH_PREPARATION,
+  MATCH_PROBLEM_FETCHED,
+  MATCH_STARTED,
+  MATCH_PARTNER_KEY_PRESS,
+  INIT_MATCH_PARTNER_KEY_PRESS,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -21,11 +26,17 @@ import {
   APP_STAGE_MATCH_PARTNER_UNAVAILABLE,
   APP_STAGE_REFUSE_MATCH_INVITATION,
   APP_STAGE_ACCEPT_MATCH_INVITATION,
+  APP_STAGE_MATCH_PREPARATION,
+  APP_STAGE_MATCH_PROBLEM_FETCHED,
+  APP_STAGE_MATCH_STARTED,
 } from '../constants/modalTypes';
 import {
   MESSAGE_FIND_MATCH_PARTNER,
   MESSAGE_MATCH_PARTNER_UNAVAILABLE,
   MESSAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
+  MESSAGE_MATCH_PREPARATION,
+  MESSAGE_MATCH_PROBLEM_FETCHED,
+  MESSAGE_MATCH_PARTNER_KEY_PRESS,
 } from '../constants/messages';
 
 export function successUserAuthentication(token, user) {
@@ -138,5 +149,52 @@ export function matchPartnerRefuseMatchInvitation(combatRoomKey) {
     modalMessage: MESSAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
     appStage: APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
     combatRoomKey,
+  };
+}
+
+export function matchPreparation(matchPartner, combatRoomKey) {
+  return {
+    type: MATCH_PREPARATION,
+    appStage: APP_STAGE_MATCH_PREPARATION,
+    modalMessage: MESSAGE_MATCH_PREPARATION,
+    matchPartner,
+    combatRoomKey,
+  };
+}
+
+export function matchProblemFetched(problem) {
+  return {
+    type: MATCH_PROBLEM_FETCHED,
+    appStage: APP_STAGE_MATCH_PROBLEM_FETCHED,
+    modalMessage: MESSAGE_MATCH_PROBLEM_FETCHED,
+    problem,
+  };
+}
+
+export function matchStarted(problem, matchId) {
+  return {
+    type: MATCH_STARTED,
+    appStage: APP_STAGE_MATCH_STARTED,
+    problem,
+    isModalActive: false,
+    modalMessage: '',
+    modalType: '',
+    isMatchStarted: true,
+  };
+}
+
+export function matchPartnerKeyPress() {
+  return {
+    type: MATCH_PARTNER_KEY_PRESS,
+    matchMessage: MESSAGE_MATCH_PARTNER_KEY_PRESS,
+    isMatchPartnerKeyPress: true,
+  };
+}
+
+export function initMatchPartnerKeyPress() {
+  return {
+    type: INIT_MATCH_PARTNER_KEY_PRESS,
+    matchMessage: '',
+    isMatchPartnerKeyPress: false,
   };
 }
