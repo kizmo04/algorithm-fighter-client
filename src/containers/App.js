@@ -21,6 +21,9 @@ import {
   matchStarted,
   matchPartnerKeyDown,
   matchPartnerKeyUp,
+  codeChanged,
+  solutionSubmitted,
+  matchPartnerSolutionSubmitted,
 } from '../actions';
 import {
   subscribePendingMatchAcceptanceEvent,
@@ -31,6 +34,7 @@ import {
   subscribeMatchStartEvent,
   subscribeMatchPartnerKeyDownEvent,
   subscribeMatchPartnerKeyUpEvent,
+  subscribeMatchPartnerSolutionSubmittedEvent,
   unsubscribePendingMatchAcceptanceEvent,
   unsubscribeSendMatchInvitationEvent,
   unsubscribeMatchPartnerRefuseMatchInvitationEvent,
@@ -44,6 +48,7 @@ import {
   emitSendRandomProblemEvent,
   emitKeyDownEvent,
   emitKeyUpEvent,
+  emitSolutionSubmittedEvent,
 } from '../lib/socket';
 import { MATCH } from '../constants/modalTypes';
 import { config } from '../config';
@@ -134,6 +139,32 @@ const mapDispatchToProps = dispatch => {
         console.log(err);
       }
     },
+    async submitSolution(userId, code, problemId, token, combatRoomKey) {
+      try {
+        console.log(userId, code, problemId, token, combatRoomKey);
+        const response = await fetch(`${ROOT}/api/users/${userId}`, {
+          method: "PUT",
+          body: JSON.stringify({ code, problem_id: problemId }),
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": `Bearer ${token}`,
+          }
+        });
+
+        const body = await response.json();
+        console.log(body)
+        const { testResult, countPassed, isPassedAll } = body;
+        console.log('code submitted', testResult, countPassed, isPassedAll)
+        dispatch(solutionSubmitted(testResult, countPassed, isPassedAll));
+        emitSolutionSubmittedEvent(testResult, countPassed, isPassedAll, combatRoomKey);
+      } catch(err) {
+        console.log(err);
+      }
+    },
+    changeCode(editor, data, code) {
+      dispatch(codeChanged(code));
+    },
     closeModal() {
       dispatch(modalClose());
     },
@@ -149,6 +180,11 @@ const mapDispatchToProps = dispatch => {
     },
     acceptMatchInvitation() {
       dispatch(acceptMatchInvitation());
+    },
+    subscribeMatchPartnerSolutionSubmittedEvent() {
+      subscribeMatchPartnerSolutionSubmittedEvent((matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll) => {
+        dispatch(matchPartnerSolutionSubmitted(matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll));
+      });
     },
     subscribeMatchPartnerUnavailableEvent() {
       subscribeMatchPartnerUnavailableEvent(() => {

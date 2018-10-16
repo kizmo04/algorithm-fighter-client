@@ -28,7 +28,7 @@ import _ from 'lodash';
 class App extends Component {
 
   componentDidUpdate(prevProps) {
-    const { token, user, matchPartner, problem, appStage, combatRoomKey, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent } = this.props;
+    const { token, user, matchPartner, problem, appStage, combatRoomKey, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent, subscribeMatchPartnerSolutionSubmittedEvent } = this.props;
     if (!prevProps.token && prevProps.token !== token) {
       emitUserLoginEvent(user);
       subscribeSendMatchInvitationEvent();
@@ -72,11 +72,12 @@ class App extends Component {
       // 게임용 subscribe on
       subscribeMatchPartnerKeyDownEvent();
       subscribeMatchPartnerKeyUpEvent();
+      subscribeMatchPartnerSolutionSubmittedEvent();
     }
   }
 
   render() {
-    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem, isMatchPartnerKeyPress, matchMessage, initMatchPartnerKeyPress, emitKeyDownEvent, emitKeyUpEvent } = this.props;
+    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem, isMatchPartnerKeyPress, matchMessage, initMatchPartnerKeyPress, emitKeyDownEvent, emitKeyUpEvent, testResult, countPassed, isPassedAll, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, submitSolution, changeCode, code } = this.props;
     const { profileImageUrl } = this.props.user;
     const matchModalProps = {
       user,
@@ -93,6 +94,12 @@ class App extends Component {
       onGitHubLoginButtonClick: authenticateUser,
       onCloseButtonClick: closeModal,
     };
+    const matchPartnerProps = {
+      matchPartner,
+      matchPartnerTestResult, 
+      matchPartnerCountPassed, 
+      matchPartnerIsPassedAll,
+    };
     return (
       <div className="App">
         <Nav imageUrl={profileImageUrl} token={token} onLoginButtonClick={openModal.bind(null, AUTH, token)} onLogoutButtonClick={logoutUser}/>
@@ -101,7 +108,7 @@ class App extends Component {
           <Route path="/matches/:match_id" render={() => {
             if (token) {
               return (
-                <CombatMatch emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 200)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 1000)} matchMessage={matchMessage} isMatchPartnerKeyPress={isMatchPartnerKeyPress} user={user} matchPartner={matchPartner} problem={problem} />
+                <CombatMatch combatRoomKey={combatRoomKey} code={code} token={token} {...matchPartnerProps} changeCode={changeCode} onSubmitButtonClick={submitSolution} emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 500)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 500)} matchMessage={matchMessage} isMatchPartnerKeyPress={isMatchPartnerKeyPress} user={user} problem={problem} />
                 );
               } else {
                 return <Redirect to="/" />;

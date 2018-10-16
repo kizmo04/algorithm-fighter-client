@@ -15,6 +15,9 @@ import {
   MATCH_STARTED,
   MATCH_PARTNER_KEY_UP,
   MATCH_PARTNER_KEY_DOWN,
+  MATCH_PARTNER_SOLUTION_SUBMITTED,
+  SOLUTION_SUBMITTED,
+  CODE_CHANGED,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -37,6 +40,7 @@ import {
   MESSAGE_MATCH_PREPARATION,
   MESSAGE_MATCH_PROBLEM_FETCHED,
   MESSAGE_MATCH_PARTNER_KEY_DOWN,
+  MESSAGE_MATCH_PARTNER_SOLUTION_SUBMITTED,
 } from '../constants/messages';
 
 export function successUserAuthentication(token, user) {
@@ -196,5 +200,30 @@ export function matchPartnerKeyUp() {
     type: MATCH_PARTNER_KEY_UP,
     matchMessage: '',
     isMatchPartnerKeyPress: false,
+  };
+}
+
+export function solutionSubmitted(testResult, countPassed, isPassedAll) {
+  return {
+    type: SOLUTION_SUBMITTED,
+    testResult,
+    countPassed,
+    isPassedAll,
+  };
+}
+
+export function matchPartnerSolutionSubmitted(matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll) {
+  return {
+    type: MATCH_PARTNER_SOLUTION_SUBMITTED,
+    matchPartnerTestResult,
+    matchPartnerCountPassed,
+    matchPartnerIsPassedAll,
+  };
+}
+
+export function codeChanged(code) {
+  return {
+    type: CODE_CHANGED,
+    code,
   };
 }

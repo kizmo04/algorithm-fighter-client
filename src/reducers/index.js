@@ -15,6 +15,9 @@ import {
   MATCH_PROBLEM_FETCHED,
   MATCH_PARTNER_KEY_DOWN,
   MATCH_PARTNER_KEY_UP,
+  MATCH_PARTNER_SOLUTION_SUBMITTED,
+  SOLUTION_SUBMITTED,
+  CODE_CHANGED,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -30,6 +33,13 @@ const initialState = {
   isMatchStarted: false,
   isMatchPartnerKeyPress: false,
   matchMessage: '',
+  matchPartnerTestResult: {},
+  matchPartnerCountPassed: 0,
+  matchPartnerIsPassedAll: false,
+  testResult: {},
+  countPassed: 0,
+  isPassedAll: false,
+  code: '',
 };
 
 function reducer(state = initialState, action) {
@@ -136,12 +146,28 @@ function reducer(state = initialState, action) {
     case MATCH_PARTNER_KEY_DOWN:
       return Object.assign({}, state, {
         matchMessage: action.matchMessage,
-        isMatchPartnerKeyPress: action.isMatchPartnerKeyPress
+        isMatchPartnerKeyPress: action.isMatchPartnerKeyPress,
       });
     case MATCH_PARTNER_KEY_UP:
       return Object.assign({}, state, {
         matchMessage: action.matchMessage,
         isMatchPartnerKeyPress: action.isMatchPartnerKeyPress,
+      });
+    case SOLUTION_SUBMITTED:
+      return Object.assign({}, state, {
+        testResult: action.testResult,
+        countPassed: action.countPassed,
+        isPassedAll: action.isPassedAll,
+      });
+    case MATCH_PARTNER_SOLUTION_SUBMITTED:
+      return Object.assign({}, state, {
+        matchPartnerTestResult: action.matchPartnerTestResult,
+        matchPartnerCountPassed: action.matchPartnerCountPassed,
+        matchPartnerIsPassedAll: action.matchPartnerIsPassedAll,
+      });
+    case CODE_CHANGED:
+      return Object.assign({}, state, {
+        code: action.code,
       });
     default:
       return state;

@@ -17,8 +17,8 @@ import {
   KEY_DOWN,
   MATCH_PARTNER_KEY_DOWN,
   MATCH_PARTNER_KEY_UP,
-  MATCH_PARTNER_SUBMIT_SOLUTION,
-  SUBMIT_SOLUTION,
+  MATCH_PARTNER_SOLUTION_SUBMITTED,
+  SOLUTION_SUBMITTED,
 } from '../constants/socketEventTypes';
 import { config } from '../config';
 
@@ -62,15 +62,20 @@ const eventListenersMap = {};
 // 이것은 소켓이벤트 말고 각자 처리?
 // 혹은 서버에서 타이머를 돌리고 소켓 클라이언트들이 받아서 보여줌
 // 타이머 종료되면 서버에서 종료메세지 띄움.
-export function subscribeMatchPartnerSubmitSolutionEvent(cb) {
-  const matchPartnerSubmitSolutionEventListener = () => {
-    cb();
+
+export function subscribeMatchPartnerSolutionSubmittedEvent(cb) {
+  const matchPartnerSolutionSubmittedEventListener = (matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll) => {
+    console.log('partner solution submitted')
+    cb(matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll);
   };
 
-  eventListenersMap[MATCH_PARTNER_SUBMIT_SOLUTION] = matchPartnerSubmitSolutionEventListener;
+  eventListenersMap[MATCH_PARTNER_SOLUTION_SUBMITTED] = matchPartnerSolutionSubmittedEventListener;
   
-  socket.on(MATCH_PARTNER_SUBMIT_SOLUTION, matchPartnerSubmitSolutionEventListener)
+  socket.on(MATCH_PARTNER_SOLUTION_SUBMITTED, matchPartnerSolutionSubmittedEventListener)
+}
 
+export function emitSolutionSubmittedEvent(testResult, countPassed, isPassedAll, combatRoomKey) {
+  socket.emit(SOLUTION_SUBMITTED, testResult, countPassed, isPassedAll, combatRoomKey);
 }
 
 export function subscribeMatchPartnerKeyDownEvent(cb) {
