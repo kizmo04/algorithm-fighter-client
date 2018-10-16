@@ -13,8 +13,8 @@ import {
   MATCH_PREPARATION,
   MATCH_PROBLEM_FETCHED,
   MATCH_STARTED,
-  MATCH_PARTNER_KEY_PRESS,
-  INIT_MATCH_PARTNER_KEY_PRESS,
+  MATCH_PARTNER_KEY_UP,
+  MATCH_PARTNER_KEY_DOWN,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -36,7 +36,7 @@ import {
   MESSAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
   MESSAGE_MATCH_PREPARATION,
   MESSAGE_MATCH_PROBLEM_FETCHED,
-  MESSAGE_MATCH_PARTNER_KEY_PRESS,
+  MESSAGE_MATCH_PARTNER_KEY_DOWN,
 } from '../constants/messages';
 
 export function successUserAuthentication(token, user) {
@@ -183,17 +183,17 @@ export function matchStarted(problem, matchId) {
   };
 }
 
-export function matchPartnerKeyPress() {
+export function matchPartnerKeyDown() {
   return {
-    type: MATCH_PARTNER_KEY_PRESS,
-    matchMessage: MESSAGE_MATCH_PARTNER_KEY_PRESS,
+    type: MATCH_PARTNER_KEY_DOWN,
+    matchMessage: MESSAGE_MATCH_PARTNER_KEY_DOWN,
     isMatchPartnerKeyPress: true,
   };
 }
 
-export function initMatchPartnerKeyPress() {
+export function matchPartnerKeyUp() {
   return {
-    type: INIT_MATCH_PARTNER_KEY_PRESS,
+    type: MATCH_PARTNER_KEY_UP,
     matchMessage: '',
     isMatchPartnerKeyPress: false,
   };

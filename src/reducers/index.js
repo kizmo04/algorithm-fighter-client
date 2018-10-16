@@ -13,8 +13,8 @@ import {
   MATCH_STARTED,
   MATCH_PREPARATION,
   MATCH_PROBLEM_FETCHED,
-  MATCH_PARTNER_KEY_PRESS,
-  INIT_MATCH_PARTNER_KEY_PRESS,
+  MATCH_PARTNER_KEY_DOWN,
+  MATCH_PARTNER_KEY_UP,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -133,12 +133,12 @@ function reducer(state = initialState, action) {
         modalMessage: action.modalMessage,
         problem: action.problem,
       });
-    case MATCH_PARTNER_KEY_PRESS:
+    case MATCH_PARTNER_KEY_DOWN:
       return Object.assign({}, state, {
         matchMessage: action.matchMessage,
         isMatchPartnerKeyPress: action.isMatchPartnerKeyPress
       });
-    case INIT_MATCH_PARTNER_KEY_PRESS:
+    case MATCH_PARTNER_KEY_UP:
       return Object.assign({}, state, {
         matchMessage: action.matchMessage,
         isMatchPartnerKeyPress: action.isMatchPartnerKeyPress,

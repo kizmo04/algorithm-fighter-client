@@ -17,16 +17,18 @@ import {
   APP_STAGE_REFUSE_MATCH_INVITATION,
   APP_STAGE_MATCH_PREPARATION,
   APP_STAGE_MATCH_PROBLEM_FETCHED,
+  APP_STAGE_MATCH_STARTED,
 } from '../../constants/modalTypes';
 import {
   AUTH,
   MATCH,
 } from '../../constants/modalTypes';
+import _ from 'lodash';
 
 class App extends Component {
 
   componentDidUpdate(prevProps) {
-    const { token, user, matchPartner, problem, appStage, combatRoomKey, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent } = this.props;
+    const { token, user, matchPartner, problem, appStage, combatRoomKey, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent } = this.props;
     if (!prevProps.token && prevProps.token !== token) {
       emitUserLoginEvent(user);
       subscribeSendMatchInvitationEvent();
@@ -66,11 +68,15 @@ class App extends Component {
     } else if (prevProps.appStage !== appStage && appStage === APP_STAGE_MATCH_PROBLEM_FETCHED) {
       emitSendRandomProblemEvent(problem, combatRoomKey);
       subscribeMatchStartEvent();
+    } else if (APP_STAGE_MATCH_STARTED) {
+      // 게임용 subscribe on
+      subscribeMatchPartnerKeyDownEvent();
+      subscribeMatchPartnerKeyUpEvent();
     }
   }
 
   render() {
-    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem } = this.props;
+    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem, isMatchPartnerKeyPress, matchMessage, initMatchPartnerKeyPress, emitKeyDownEvent, emitKeyUpEvent } = this.props;
     const { profileImageUrl } = this.props.user;
     const matchModalProps = {
       user,
@@ -92,7 +98,15 @@ class App extends Component {
         <Nav imageUrl={profileImageUrl} token={token} onLoginButtonClick={openModal.bind(null, AUTH, token)} onLogoutButtonClick={logoutUser}/>
         <Switch>
           <Route exact path="/" render={() => <Main user={user} onBattleButtonClick={openModal.bind(null, MATCH, token)} />}/>
-          <Route path="/matches/:match_id" render={() => <CombatMatch user={user} matchPartner={matchPartner} problem={problem} />}/>
+          <Route path="/matches/:match_id" render={() => {
+            if (token) {
+              return (
+                <CombatMatch emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 200)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 1000)} matchMessage={matchMessage} isMatchPartnerKeyPress={isMatchPartnerKeyPress} user={user} matchPartner={matchPartner} problem={problem} />
+                );
+              } else {
+                return <Redirect to="/" />;
+              }
+            }}/>
         </Switch>
         <Modal isActive={isModalActive} onCloseButtonClick={closeModal}>
           {

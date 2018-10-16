@@ -19,6 +19,8 @@ import {
   matchProblemFetched,
   matchPreparation,
   matchStarted,
+  matchPartnerKeyDown,
+  matchPartnerKeyUp,
 } from '../actions';
 import {
   subscribePendingMatchAcceptanceEvent,
@@ -27,6 +29,8 @@ import {
   subscribeMatchPartnerUnavailableEvent,
   subscribeMatchPartnerEnteredEvent,
   subscribeMatchStartEvent,
+  subscribeMatchPartnerKeyDownEvent,
+  subscribeMatchPartnerKeyUpEvent,
   unsubscribePendingMatchAcceptanceEvent,
   unsubscribeSendMatchInvitationEvent,
   unsubscribeMatchPartnerRefuseMatchInvitationEvent,
@@ -38,6 +42,8 @@ import {
   emitUserLoginEvent,
   emitUserLogoutEvent,
   emitSendRandomProblemEvent,
+  emitKeyDownEvent,
+  emitKeyUpEvent,
 } from '../lib/socket';
 import { MATCH } from '../constants/modalTypes';
 import { config } from '../config';
@@ -174,6 +180,16 @@ const mapDispatchToProps = dispatch => {
         dispatch(matchStarted(problem));
       });
     },
+    subscribeMatchPartnerKeyDownEvent() {
+      subscribeMatchPartnerKeyDownEvent(() => {
+        dispatch(matchPartnerKeyDown());
+      });
+    },
+    subscribeMatchPartnerKeyUpEvent() {
+      subscribeMatchPartnerKeyUpEvent(() => {
+        dispatch(matchPartnerKeyUp());
+      });
+    },
     unsubscribePendingMatchAcceptanceEvent() {
       unsubscribePendingMatchAcceptanceEvent();
     },
@@ -206,6 +222,12 @@ const mapDispatchToProps = dispatch => {
     },
     emitSendRandomProblemEvent(problem, combatRoomKey) {
       emitSendRandomProblemEvent(problem, combatRoomKey);
+    },
+    emitKeyDownEvent(combatRoomKey) {
+      emitKeyDownEvent(combatRoomKey);
+    },
+    emitKeyUpEvent(combatRoomKey) {
+      emitKeyUpEvent(combatRoomKey);
     },
   };
 };

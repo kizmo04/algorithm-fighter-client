@@ -13,8 +13,10 @@ import {
   USER_LOGIN,
   SEND_RANDOM_PROBLEM,
   MATCH_START,
-  KEY_PRESS,
-  MATCH_PARTNER_KEY_PRESS,
+  KEY_UP,
+  KEY_DOWN,
+  MATCH_PARTNER_KEY_DOWN,
+  MATCH_PARTNER_KEY_UP,
   MATCH_PARTNER_SUBMIT_SOLUTION,
   SUBMIT_SOLUTION,
 } from '../constants/socketEventTypes';
@@ -71,18 +73,36 @@ export function subscribeMatchPartnerSubmitSolutionEvent(cb) {
 
 }
 
-export function subscribeMatchPartnerKeyPressEvent(cb) {
-  const matchPartnerKeyPressEventListener = isMatchPartnerKeyPress => {
-    cb(isMatchPartnerKeyPress);
+export function subscribeMatchPartnerKeyDownEvent(cb) {
+  const matchPartnerKeyDownEventListener = () => {
+    console.log('subs partner key down!')
+    cb();
   };
 
-  eventListenersMap[MATCH_PARTNER_KEY_PRESS] = matchPartnerKeyPressEventListener;
+  eventListenersMap[MATCH_PARTNER_KEY_DOWN] = matchPartnerKeyDownEventListener;
 
-  socket.on(MATCH_PARTNER_KEY_PRESS, matchPartnerKeyPressEventListener);
+  socket.on(MATCH_PARTNER_KEY_DOWN, matchPartnerKeyDownEventListener);
 }
 
-export function emitKeyPressEvent(val) {
-  socket.emit(KEY_PRESS, val);
+export function subscribeMatchPartnerKeyUpEvent(cb) {
+  const matchPartnerKeyUpEventListener = () => {
+    console.log('subs partner key Up!')
+    cb();
+  };
+
+  eventListenersMap[MATCH_PARTNER_KEY_UP] = matchPartnerKeyUpEventListener;
+
+  socket.on(MATCH_PARTNER_KEY_UP, matchPartnerKeyUpEventListener);
+}
+
+export function emitKeyDownEvent(combatRoomKey) {
+  console.log('emit keyDown: ', combatRoomKey)
+  socket.emit(KEY_DOWN, combatRoomKey);
+}
+
+export function emitKeyUpEvent(combatRoomKey) {
+  console.log('emit keyUp: ', combatRoomKey)
+  socket.emit(KEY_UP, combatRoomKey);
 }
 
 export function subscribeMatchStartEvent(cb) {
