@@ -16,8 +16,10 @@ import {
   MATCH_PARTNER_KEY_UP,
   MATCH_PARTNER_KEY_DOWN,
   MATCH_PARTNER_SOLUTION_SUBMITTED,
-  SOLUTION_SUBMITTED,
   CODE_CHANGED,
+  MATCH_TIMER,
+  REQUEST_SOLUTION_SUBMIT,
+  SUCCESS_SOLUTION_SUBMIT,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -166,12 +168,13 @@ export function matchPreparation(matchPartner, combatRoomKey) {
   };
 }
 
-export function matchProblemFetched(problem) {
+export function matchProblemFetched(problem, matchId) {
   return {
     type: MATCH_PROBLEM_FETCHED,
     appStage: APP_STAGE_MATCH_PROBLEM_FETCHED,
     modalMessage: MESSAGE_MATCH_PROBLEM_FETCHED,
     problem,
+    matchId,
   };
 }
 
@@ -184,6 +187,7 @@ export function matchStarted(problem, matchId) {
     modalMessage: '',
     modalType: '',
     isMatchStarted: true,
+    matchId,
   };
 }
 
@@ -203,12 +207,13 @@ export function matchPartnerKeyUp() {
   };
 }
 
-export function solutionSubmitted(testResult, countPassed, isPassedAll) {
+export function successSolutionSubmit(testResult, countPassed, isPassedAll) {
   return {
-    type: SOLUTION_SUBMITTED,
+    type: SUCCESS_SOLUTION_SUBMIT,
     testResult,
     countPassed,
     isPassedAll,
+    isFetching: false,
   };
 }
 
@@ -225,5 +230,19 @@ export function codeChanged(code) {
   return {
     type: CODE_CHANGED,
     code,
+  };
+}
+
+export function matchTimer (matchTime) {
+  return {
+    type: MATCH_TIMER,
+    matchTime,
+  };
+}
+
+export function requestSolutionSubmit() {
+  return {
+    type: REQUEST_SOLUTION_SUBMIT,
+    isFetching: true,
   };
 }

@@ -1,0 +1,60 @@
+.CodeMirror {
+  height: 550px;
+  text-align: left;
+}
+
+.user-status-box:first-child {
+  text-align: left;
+}
+
+.user-status-box:last-child {
+  text-align: right;
+}
+
+.user-status-box .user-email {
+  margin-bottom: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.user-profile {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.user-gauge {
+  background-color: white;
+}
+
+.blinking{
+  -webkit-animation: blink 1.5s ease-in-out infinite alternate;
+  -moz-animation: blink 1.5s ease-in-out infinite alternate;
+  animation: blink 1.5s ease-in-out infinite alternate;
+}
+@-webkit-keyframes blink{
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: -1px 1px 5px #03c, 1px -1px 5px #03c;
+  }
+}
+@-moz-keyframes blink{
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: -1px 1px 5px #03c, 1px -1px 5px #03c;
+  }
+}
+@keyframes blink{
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: -1px 1px 5px #03c, 1px -1px 5px #03c;
+  }
+}

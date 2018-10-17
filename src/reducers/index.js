@@ -16,8 +16,10 @@ import {
   MATCH_PARTNER_KEY_DOWN,
   MATCH_PARTNER_KEY_UP,
   MATCH_PARTNER_SOLUTION_SUBMITTED,
-  SOLUTION_SUBMITTED,
   CODE_CHANGED,
+  MATCH_TIMER,
+  REQUEST_SOLUTION_SUBMIT,
+  SUCCESS_SOLUTION_SUBMIT,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -40,10 +42,17 @@ const initialState = {
   countPassed: 0,
   isPassedAll: false,
   code: '',
+  matchId: '',
+  matchTime: '',
+  isFetching: false,
 };
 
 function reducer(state = initialState, action) {
   switch(action.type) {
+    case MATCH_TIMER:
+      return Object.assign({}, state, {
+        matchTime: action.matchTime,
+      });
     case ACCEPT_MATCH_INVITATION:
       return Object.assign({}, state, {
         isModalActive: action.isModalActive,
@@ -129,6 +138,7 @@ function reducer(state = initialState, action) {
         modalMessage: action.modalMessage,
         modalType: action.modalType,
         isMatchStarted: action.isMatchStarted,
+        matchId: action.matchId,
       });
     case MATCH_PREPARATION:
       return Object.assign({}, state, {
@@ -142,6 +152,7 @@ function reducer(state = initialState, action) {
         appStage: action.appStage,
         modalMessage: action.modalMessage,
         problem: action.problem,
+        matchId: action.matchId,
       });
     case MATCH_PARTNER_KEY_DOWN:
       return Object.assign({}, state, {
@@ -153,11 +164,12 @@ function reducer(state = initialState, action) {
         matchMessage: action.matchMessage,
         isMatchPartnerKeyPress: action.isMatchPartnerKeyPress,
       });
-    case SOLUTION_SUBMITTED:
+    case SUCCESS_SOLUTION_SUBMIT:
       return Object.assign({}, state, {
         testResult: action.testResult,
         countPassed: action.countPassed,
         isPassedAll: action.isPassedAll,
+        isFetching: action.isFetching,
       });
     case MATCH_PARTNER_SOLUTION_SUBMITTED:
       return Object.assign({}, state, {
@@ -168,6 +180,10 @@ function reducer(state = initialState, action) {
     case CODE_CHANGED:
       return Object.assign({}, state, {
         code: action.code,
+      });
+    case REQUEST_SOLUTION_SUBMIT:
+      return Object.assign({}, state, {
+        isFetching: action.isFetching,
       });
     default:
       return state;

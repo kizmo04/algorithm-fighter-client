@@ -19,6 +19,7 @@ import {
   MATCH_PARTNER_KEY_UP,
   MATCH_PARTNER_SOLUTION_SUBMITTED,
   SOLUTION_SUBMITTED,
+  MATCH_TIMER,
 } from '../constants/socketEventTypes';
 import { config } from '../config';
 
@@ -63,6 +64,16 @@ const eventListenersMap = {};
 // 혹은 서버에서 타이머를 돌리고 소켓 클라이언트들이 받아서 보여줌
 // 타이머 종료되면 서버에서 종료메세지 띄움.
 
+export function subscribeMatchTimerEvent(cb) {
+  const matchTimerEventListener = (time) => {
+    cb(time);
+  };
+
+  eventListenersMap[MATCH_TIMER] = matchTimerEventListener;
+
+  socket.on(MATCH_TIMER, matchTimerEventListener);
+}
+
 export function subscribeMatchPartnerSolutionSubmittedEvent(cb) {
   const matchPartnerSolutionSubmittedEventListener = (matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll) => {
     console.log('partner solution submitted')
@@ -70,8 +81,8 @@ export function subscribeMatchPartnerSolutionSubmittedEvent(cb) {
   };
 
   eventListenersMap[MATCH_PARTNER_SOLUTION_SUBMITTED] = matchPartnerSolutionSubmittedEventListener;
-  
-  socket.on(MATCH_PARTNER_SOLUTION_SUBMITTED, matchPartnerSolutionSubmittedEventListener)
+
+  socket.on(MATCH_PARTNER_SOLUTION_SUBMITTED, matchPartnerSolutionSubmittedEventListener);
 }
 
 export function emitSolutionSubmittedEvent(testResult, countPassed, isPassedAll, combatRoomKey) {
@@ -111,9 +122,9 @@ export function emitKeyUpEvent(combatRoomKey) {
 }
 
 export function subscribeMatchStartEvent(cb) {
-  const matchStartEventListener = problem => {
+  const matchStartEventListener = (problem, matchId) => {
     console.log('in match start on!')
-    cb(problem);
+    cb(problem, matchId);
   };
 
   eventListenersMap[MATCH_START] = matchStartEventListener;
@@ -121,9 +132,9 @@ export function subscribeMatchStartEvent(cb) {
   socket.on(MATCH_START, matchStartEventListener);
 }
 
-export function emitSendRandomProblemEvent(problem, combatRoomKey) {
+export function emitSendRandomProblemEvent(problem, combatRoomKey, matchId) {
   console.log('send problem: ', problem)
-  socket.emit(SEND_RANDOM_PROBLEM, problem, combatRoomKey);
+  socket.emit(SEND_RANDOM_PROBLEM, problem, combatRoomKey, matchId);
 }
 
 export function subscribeMatchPartnerEnteredEvent(cb) {

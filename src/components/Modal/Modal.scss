@@ -8,3 +8,11 @@
   flex-direction: column;
   justify-content: center;
 }
+
+.modal-section {
+  display: none;
+}
+
+.is-active {
+  display: block;
+}

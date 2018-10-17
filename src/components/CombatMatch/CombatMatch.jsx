@@ -4,6 +4,7 @@ import "../../../node_modules/codemirror/lib/codemirror.css";
 import "../../../node_modules/codemirror/theme/tomorrow-night-bright.css";
 import "../../../node_modules/codemirror/mode/xml/xml";
 import "../../../node_modules/codemirror/mode/javascript/javascript";
+import "./CombatMatch.scss";
 
 class CombatMatch extends Component {
   constructor(props) {
@@ -14,8 +15,6 @@ class CombatMatch extends Component {
   }
 
   handleKeyDown (editor, e) {
-    console.log('key press value: ', e.key);
-
     this.props.emitKeyDownEvent();
   }
 
@@ -29,30 +28,57 @@ class CombatMatch extends Component {
     onSubmitButtonClick(user._id, code, problem._id, token, combatRoomKey);
   }
   render() {
-    const { user, matchPartner, isMatchPartnerKeyPress, matchMessage, code, changeCode, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll } = this.props;
+    const { isFetching, matchPartner, isMatchPartnerKeyPress, matchMessage, code, changeCode, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, countPassed, testResult, matchTime } = this.props;
     const { description, title } = this.props.problem;
+    const { profileImageUrl, email } = this.props.user;
     const options = {
       mode: "javascript",
       theme: "tomorrow-night-bright",
       lineNumbers: true,
       lineWrapping: true
     };
+    const matchPartnerGauge = matchPartnerCountPassed ? Math.round(matchPartnerCountPassed / matchPartnerTestResult.length * 100) : 0;
+    const userGauge = countPassed ? Math.round(countPassed / testResult.length * 100) : 0;
+    console.log(userGauge)
     return (
-        <Fragment>
-          <h2>나</h2>
-          <h3>{ user.email }</h3>
-          <h2>상대</h2>
-          <h3>{ matchPartner.email }</h3>
-          <h3>상대가 테스트를 { matchPartnerCountPassed }개 통과했습니다.</h3>
-          <span>{ isMatchPartnerKeyPress ? matchMessage : '' }</span>
-          <h2>{title}</h2>
-          <p>{description}</p>
-          
-            {/* <textarea className="textarea is-danger is-normal" rows="50" value={initial_code} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp}></textarea> */}
+      <Fragment>
+        <div className="columns">
+          <div className="column is-full user-status-bar">
+            <div className="columns is-2">
+              <div className="column is-two-fifths user-status-box">
+                <figure className={`image is-64x64 user-profile ${ isMatchPartnerKeyPress ? 'blinking' : '' }`}>
+                  <img className="is-rounded" src={matchPartner.profileImageUrl} alt="" />
+                </figure>
+                <h3 className={`title is-size-3 user-email ${ isMatchPartnerKeyPress ? 'blinking' : '' }`}>{ matchPartner.email }</h3>
+                <progress class={`progress is-danger is-large ${ isMatchPartnerKeyPress ? 'blinking' : '' }`} value={matchPartnerGauge} max="100"></progress>
+                <span className="subtitle is-size-3">{matchPartnerGauge}%</span>
+              </div>
+              <div className="column is-one-fifths">
+                <h3>상대가 테스트를 { Math.ceil(matchPartnerCountPassed) }개 통과했습니다.</h3>
+                <span>{matchTime}</span>
+              </div>
+              <div className="column is-two-fifths user-status-box">
+                <h3 className="title is-size-3 user-email">{ email }</h3>
+                <figure className="image is-64x64 user-profile">
+                  <img className="is-rounded" src={profileImageUrl} alt="" />
+                </figure>
+                <progress class="progress is-info is-large user-gauge" value={userGauge} max="100"></progress>
+                <span className="subtitle is-size-3">{userGauge}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="columns is-2">
+          <div className="column is-half">
+            <h2 className="title">{title}</h2>
+            <p className="subtitle">{description}</p>
+          </div>
+          <div className="column is-half">
             <CodeMirror options={options} value={code} onBeforeChange={changeCode} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} />
-            <button onClick={this.handleClickSubmit} className="button is-danger is-large" type="submit">Attack!</button>
-
-        </Fragment>
+            <button onClick={this.handleClickSubmit} className={`button is-danger is-large ${isFetching ? 'is-loading' : ''}`} type="submit">Attack!</button>
+          </div>
+        </div>
+      </Fragment>
     );
   }
 }

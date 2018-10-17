@@ -13,7 +13,7 @@ class Modal extends Component {
   render() {
     const { isActive } = this.props;
     return (
-      <section className="section is-medium">
+      <section className={`section is-medium modal-section ${isActive ? "is-active" : ""}`}>
         <div className="container">
           <div className={`modal ${isActive ? "is-active" : ""}`}>
             <div className="modal-background"></div>

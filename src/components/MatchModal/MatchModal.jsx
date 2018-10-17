@@ -5,6 +5,8 @@ import {
   APP_STAGE_RECEIVING_MATCH_INVITATION,
   APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION,
   APP_STAGE_MATCH_PARTNER_UNAVAILABLE,
+  APP_STAGE_MATCH_PREPARATION,
+  APP_STAGE_MATCH_PROBLEM_FETCHED,
 } from '../../constants/modalTypes';
 
 
@@ -61,6 +63,9 @@ class MatchModal extends Component {
             <span>{modalMessage}</span>
             <button className="button is-small" onClick={this.handleRetryButtonClick}>다시 찾기</button>
           </div>
+        ) : 
+        appStage === APP_STAGE_MATCH_PREPARATION || APP_STAGE_MATCH_PROBLEM_FETCHED ? (
+        <span className="subtitle is-2">{modalMessage}</span>
         ) : null
       }
       </section>

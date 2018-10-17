@@ -22,10 +22,13 @@ import {
   matchPartnerKeyDown,
   matchPartnerKeyUp,
   codeChanged,
-  solutionSubmitted,
   matchPartnerSolutionSubmitted,
+  matchTimer,
+  requestSolutionSubmit,
+  successSolutionSubmit,
 } from '../actions';
 import {
+  subscribeMatchTimerEvent,
   subscribePendingMatchAcceptanceEvent,
   subscribeSendMatchInvitationEvent,
   subscribeMatchPartnerRefuseMatchInvitationEvent,
@@ -93,7 +96,7 @@ const mapDispatchToProps = dispatch => {
             if (err) {
               console.log(err);
             }
-            const { _id, name, userName, profileImageUrl, email, shortBio } = decoded;
+            const { _id, name, userName, profileImageUrl, email, shortBio, createdAt, solutions } = decoded;
             const user = {
               _id,
               name,
@@ -101,7 +104,10 @@ const mapDispatchToProps = dispatch => {
               profileImageUrl,
               email,
               shortBio,
+              createdAt,
+              solutions,
             };
+            localStorage.setItem('algorithmFighter', JSON.stringify({ token }));
             dispatch(successUserAuthentication(token, user));
           });
         })
@@ -116,32 +122,57 @@ const mapDispatchToProps = dispatch => {
     logoutUser() {
       signOutGitHub()
       .then(() => {
+        if (localStorage['algorithmFighter']) {
+          localStorage['algorithmFighter'].token = '';
+        }
         dispatch(userLogout());
       })
       .catch(err => {
         console.log(err);
       })
     },
-    async fetchRandomProblem(userIdOrProblemId, matchPartnerId) {
+    async fetchRandomProblem(userIdOrProblemId, matchPartnerId, combatRoomKey, token) {
       try {
-        let problem;
+        let problem, matchId;
         if (matchPartnerId) {
-          const response = await fetch(`${ROOT}/api/problems/random?u_id=${userIdOrProblemId}&p_id=${matchPartnerId}`);
-          const body = await response.json();
-          problem = body.problem;
+          const responseRandomProblem = await fetch(`${ROOT}/api/problems/random?u_id=${userIdOrProblemId}&p_id=${matchPartnerId}`, {
+            method: "GET",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+              "Authorization": `Bearer ${token}`
+            },
+          });
+          const bodyRandomProblem = await responseRandomProblem.json();
+          problem = bodyRandomProblem.problem;
+          const responseNewMatch = await fetch(`${ROOT}/api/matches`, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              host_id: userIdOrProblemId,
+              guest_id: matchPartnerId,
+            })
+          });
+          const bodyNewMatch = await responseNewMatch.json();
+          matchId = bodyNewMatch._id;
         } else {
           const response = await fetch(`${ROOT}/api/problems/${userIdOrProblemId}`);
           const body = await response.json();
           problem = body.problem;
         }
-        dispatch(matchProblemFetched(problem));
+        dispatch(matchProblemFetched(problem, matchId));
+        emitSendRandomProblemEvent(problem, combatRoomKey, matchId);
       } catch(err) {
         console.log(err);
       }
     },
     async submitSolution(userId, code, problemId, token, combatRoomKey) {
       try {
-        console.log(userId, code, problemId, token, combatRoomKey);
+        dispatch(requestSolutionSubmit());
         const response = await fetch(`${ROOT}/api/users/${userId}`, {
           method: "PUT",
           body: JSON.stringify({ code, problem_id: problemId }),
@@ -153,14 +184,43 @@ const mapDispatchToProps = dispatch => {
         });
 
         const body = await response.json();
-        console.log(body)
         const { testResult, countPassed, isPassedAll } = body;
-        console.log('code submitted', testResult, countPassed, isPassedAll)
-        dispatch(solutionSubmitted(testResult, countPassed, isPassedAll));
-        emitSolutionSubmittedEvent(testResult, countPassed, isPassedAll, combatRoomKey);
+        let intervalCountPassed = 0;
+        const intervalId = setInterval(() => {
+          if (Math.round(intervalCountPassed * 100) === countPassed * 100) {
+            clearInterval(intervalId);
+          } else {
+            intervalCountPassed += countPassed / 10;
+            dispatch(successSolutionSubmit(testResult, intervalCountPassed, isPassedAll));
+            emitSolutionSubmittedEvent(testResult, intervalCountPassed, isPassedAll, combatRoomKey);
+          }
+        }, 100);
       } catch(err) {
         console.log(err);
       }
+    },
+    checkUserAuth() {
+      if (localStorage['algorithmFighter']) {
+        const token = JSON.parse(localStorage['algorithmFighter']).token;
+        jwt.verify(token, JWT_SECRET, (err, decoded) => {
+          if (err) {
+            console.log(err);
+          }
+          const { _id, name, userName, profileImageUrl, email, shortBio, createdAt, solutions } = decoded;
+          const user = {
+            _id,
+            name,
+            userName,
+            profileImageUrl,
+            email,
+            shortBio,
+            createdAt,
+            solutions,
+          };
+          dispatch(successUserAuthentication(token, user));
+        });
+      }
+
     },
     changeCode(editor, data, code) {
       dispatch(codeChanged(code));
@@ -180,6 +240,11 @@ const mapDispatchToProps = dispatch => {
     },
     acceptMatchInvitation() {
       dispatch(acceptMatchInvitation());
+    },
+    subscribeMatchTimerEvent() {
+      subscribeMatchTimerEvent(time => {
+        dispatch(matchTimer(time));
+      });
     },
     subscribeMatchPartnerSolutionSubmittedEvent() {
       subscribeMatchPartnerSolutionSubmittedEvent((matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll) => {
@@ -212,8 +277,8 @@ const mapDispatchToProps = dispatch => {
       });
     },
     subscribeMatchStartEvent() {
-      subscribeMatchStartEvent(problem => {
-        dispatch(matchStarted(problem));
+      subscribeMatchStartEvent((problem,matchId) => {
+        dispatch(matchStarted(problem, matchId));
       });
     },
     subscribeMatchPartnerKeyDownEvent() {
@@ -239,7 +304,7 @@ const mapDispatchToProps = dispatch => {
       unsubscribeMatchPartnerUnavailableEvent();
     },
     emitFindMatchPartnerEvent(user, combatRoomKey) {
-      emitFindMatchPartnerEvent({ hostUser: user, prevCombatRoomKey: combatRoomKey });
+      emitFindMatchPartnerEvent(user, combatRoomKey);
     },
     emitAcceptMatchInvitationEvent(combatRoomKey, guestUser) {
       emitAcceptMatchInvitationEvent(combatRoomKey, guestUser);
@@ -256,8 +321,8 @@ const mapDispatchToProps = dispatch => {
     emitFindMatchPartnerEndEvent(combatRoomKey) {
       emitFindMatchPartnerEndEvent(combatRoomKey);
     },
-    emitSendRandomProblemEvent(problem, combatRoomKey) {
-      emitSendRandomProblemEvent(problem, combatRoomKey);
+    emitSendRandomProblemEvent(problem, combatRoomKey, matchId) {
+      emitSendRandomProblemEvent(problem, combatRoomKey, matchId);
     },
     emitKeyDownEvent(combatRoomKey) {
       emitKeyDownEvent(combatRoomKey);
