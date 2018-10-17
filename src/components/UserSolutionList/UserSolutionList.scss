@@ -1,0 +1,33 @@
+.solution {
+  .entry {
+    .title {
+      .created-at {
+        text-align: left;
+      }
+      .code {
+      }
+    }
+    .entry-title {
+
+    }
+    .entry-content {
+      height: 0;
+      .CodeMirror {
+        height: 0;
+      }
+    }
+
+    ul.is-expand {
+      height: auto;
+      .CodeMirror {
+        height: 500px;
+      }
+    }
+  }
+}
+
+.CodeMirror {
+  font-size: 14px;
+}
+
+

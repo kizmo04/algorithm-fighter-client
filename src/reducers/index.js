@@ -20,6 +20,10 @@ import {
   MATCH_TIMER,
   REQUEST_SOLUTION_SUBMIT,
   SUCCESS_SOLUTION_SUBMIT,
+  SUCCESS_USER_PAST_MATCH_RESULT,
+  SUCCESS_USER_PAST_SOLUTION_LIST,
+  ACCORDION_EXPANDED,
+  ACCORDION_COLLAPSED,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -45,6 +49,9 @@ const initialState = {
   matchId: '',
   matchTime: '',
   isFetching: false,
+  matchResultList: [],
+  solutionList: [],
+  expandedAccordionIndex: -1,
 };
 
 function reducer(state = initialState, action) {
@@ -184,6 +191,18 @@ function reducer(state = initialState, action) {
     case REQUEST_SOLUTION_SUBMIT:
       return Object.assign({}, state, {
         isFetching: action.isFetching,
+      });
+    case SUCCESS_USER_PAST_MATCH_RESULT:
+      return Object.assign({}, state, {
+        matchResultList: action.matchResultList,
+      });
+    case SUCCESS_USER_PAST_SOLUTION_LIST:
+      return Object.assign({}, state, {
+        solutionList: action.solutionList,
+      });
+    case ACCORDION_EXPANDED:
+      return Object.assign({}, state, {
+        expandedAccordionIndex: action.expandedAccordionIndex,
       });
     default:
       return state;

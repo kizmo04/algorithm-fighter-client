@@ -20,6 +20,10 @@ import {
   MATCH_TIMER,
   REQUEST_SOLUTION_SUBMIT,
   SUCCESS_SOLUTION_SUBMIT,
+  SUCCESS_USER_PAST_MATCH_RESULT,
+  SUCCESS_USER_PAST_SOLUTION_LIST,
+  ACCORDION_EXPANDED,
+  ACCORDION_COLLAPSED,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -244,5 +248,26 @@ export function requestSolutionSubmit() {
   return {
     type: REQUEST_SOLUTION_SUBMIT,
     isFetching: true,
+  };
+}
+
+export function successUserPastMatchResult(matchResultList) {
+  return {
+    type: SUCCESS_USER_PAST_MATCH_RESULT,
+    matchResultList,
+  };
+}
+
+export function successUserPastSolutionList(solutionList) {
+  return {
+    type: SUCCESS_USER_PAST_SOLUTION_LIST,
+    solutionList,
+  };
+}
+
+export function accordionExpanded(index) {
+  return {
+    type: ACCORDION_EXPANDED,
+    expandedAccordionIndex: index,
   };
 }

@@ -26,6 +26,9 @@ import {
   matchTimer,
   requestSolutionSubmit,
   successSolutionSubmit,
+  successUserPastMatchResult,
+  successUserPastSolutionList,
+  accordionExpanded,
 } from '../actions';
 import {
   subscribeMatchTimerEvent,
@@ -199,6 +202,42 @@ const mapDispatchToProps = dispatch => {
         console.log(err);
       }
     },
+    async fetchUserPastMatchResult(userId, token) {
+      try {
+        const response = await fetch(`${ROOT}/api/users/${userId}/matches`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const body = await response.json();
+
+        dispatch(successUserPastMatchResult(body));
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async fetchUserPastSolutions(userId, token) {
+      try {
+        const response = await fetch(`${ROOT}/api/users/${userId}/solutions`, {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const body = await response.json();
+
+        dispatch(successUserPastSolutionList(body));
+      } catch (error) {
+        console.log(error);
+      }
+    },
     checkUserAuth() {
       if (localStorage['algorithmFighter']) {
         const token = JSON.parse(localStorage['algorithmFighter']).token;
@@ -221,6 +260,9 @@ const mapDispatchToProps = dispatch => {
         });
       }
 
+    },
+    expandAccordion(index) {
+      dispatch(accordionExpanded(index));
     },
     changeCode(editor, data, code) {
       dispatch(codeChanged(code));

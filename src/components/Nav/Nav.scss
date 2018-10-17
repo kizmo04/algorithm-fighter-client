@@ -5,8 +5,9 @@
 .navbar-end {
   display: inline-flex;
   align-items: center;
-  padding: 0 2vw;
+  padding: 0 2em;
   & .button {
+    padding: 0 1em;
     margin-right: 2vw;
   }
 }

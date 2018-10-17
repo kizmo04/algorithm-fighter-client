@@ -24,11 +24,15 @@ import {
   MATCH,
 } from '../../constants/modalTypes';
 import _ from 'lodash';
+import UserDetail from "../UserDetail/UserDetail";
 
 class App extends Component {
+  componentDidMount() {
+    this.props.checkUserAuth();
+  }
 
   componentDidUpdate(prevProps) {
-    const { token, user, matchPartner, problem, appStage, combatRoomKey, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent, subscribeMatchPartnerSolutionSubmittedEvent } = this.props;
+    const { token, user, matchPartner, problem, isFetching, appStage, combatRoomKey, matchId, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent, subscribeMatchPartnerSolutionSubmittedEvent, subscribeMatchTimerEvent } = this.props;
     if (!prevProps.token && prevProps.token !== token) {
       emitUserLoginEvent(user);
       subscribeSendMatchInvitationEvent();
@@ -64,21 +68,20 @@ class App extends Component {
       emitAcceptMatchInvitationEvent(combatRoomKey, user);
       subscribeMatchStartEvent();
     } else if (prevProps.appStage !== appStage && appStage === APP_STAGE_MATCH_PREPARATION) {
-      fetchRandomProblem(user._id, matchPartner._id);
+      fetchRandomProblem(user._id, matchPartner._id, combatRoomKey, token);
     } else if (prevProps.appStage !== appStage && appStage === APP_STAGE_MATCH_PROBLEM_FETCHED) {
-      emitSendRandomProblemEvent(problem, combatRoomKey);
       subscribeMatchStartEvent();
-    } else if (APP_STAGE_MATCH_STARTED) {
+    } else if (prevProps.appStage !== appStage && appStage === APP_STAGE_MATCH_STARTED) {
       // 게임용 subscribe on
       subscribeMatchPartnerKeyDownEvent();
       subscribeMatchPartnerKeyUpEvent();
       subscribeMatchPartnerSolutionSubmittedEvent();
+      subscribeMatchTimerEvent();
     }
   }
 
   render() {
-    const { token, authenticateUser, logoutUser, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem, isMatchPartnerKeyPress, matchMessage, initMatchPartnerKeyPress, emitKeyDownEvent, emitKeyUpEvent, testResult, countPassed, isPassedAll, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, submitSolution, changeCode, code } = this.props;
-    const { profileImageUrl } = this.props.user;
+    const { token, isFetching, expandedAccordionIndex, expandAccordion, authenticateUser, logoutUser, solutionList, matchResultList, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem, isMatchPartnerKeyPress, matchMessage, initMatchPartnerKeyPress, emitKeyDownEvent, emitKeyUpEvent, testResult, countPassed, isPassedAll, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, submitSolution, changeCode, code, matchTime, fetchUserPastMatchResult, fetchUserPastSolutions } = this.props;
     const matchModalProps = {
       user,
       appStage,
@@ -96,24 +99,39 @@ class App extends Component {
     };
     const matchPartnerProps = {
       matchPartner,
-      matchPartnerTestResult, 
-      matchPartnerCountPassed, 
+      matchPartnerTestResult,
+      matchPartnerCountPassed,
       matchPartnerIsPassedAll,
+      isMatchPartnerKeyPress,
+    };
+
+    const userProps = {
+      user,
+      testResult,
+      countPassed,
+      isPassedAll,
     };
     return (
       <div className="App">
-        <Nav imageUrl={profileImageUrl} token={token} onLoginButtonClick={openModal.bind(null, AUTH, token)} onLogoutButtonClick={logoutUser}/>
+        <Nav user={user} token={token} onLoginButtonClick={openModal.bind(null, AUTH, token)} onLogoutButtonClick={logoutUser}/>
         <Switch>
           <Route exact path="/" render={() => <Main user={user} onBattleButtonClick={openModal.bind(null, MATCH, token)} />}/>
           <Route path="/matches/:match_id" render={() => {
             if (token) {
               return (
-                <CombatMatch combatRoomKey={combatRoomKey} code={code} token={token} {...matchPartnerProps} changeCode={changeCode} onSubmitButtonClick={submitSolution} emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 500)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 500)} matchMessage={matchMessage} isMatchPartnerKeyPress={isMatchPartnerKeyPress} user={user} problem={problem} />
+                <CombatMatch isFetching={isFetching} matchTime={matchTime} combatRoomKey={combatRoomKey} code={code} token={token} {...userProps} {...matchPartnerProps} changeCode={changeCode} onSubmitButtonClick={submitSolution} emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 500)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 500)} matchMessage={matchMessage} problem={problem} />
                 );
               } else {
                 return <Redirect to="/" />;
               }
             }}/>
+          <Route path="/users/:user_id" render={({ location }) => {
+            if (token) {
+              return <UserDetail expandAccordion={expandAccordion} expandedAccordionIndex={expandedAccordionIndex} token={token} solutionList={solutionList} fetchUserPastSolutions={fetchUserPastSolutions} fetchUserPastMatchResult={fetchUserPastMatchResult} matchResultList={matchResultList} pathName={location.pathname} user={user} />;
+            } else {
+              return <Redirect to="/" />;
+            }
+          }} />
         </Switch>
         <Modal isActive={isModalActive} onCloseButtonClick={closeModal}>
           {
