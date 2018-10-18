@@ -33,6 +33,7 @@ import {
   successMatchEnd,
 } from '../actions';
 import {
+  subscribeMatchPartnerWinningEvent,
   subscribeMatchTimerEvent,
   subscribePendingMatchAcceptanceEvent,
   subscribeSendMatchInvitationEvent,
@@ -57,6 +58,7 @@ import {
   emitKeyDownEvent,
   emitKeyUpEvent,
   emitSolutionSubmittedEvent,
+  emitUserWinningEvent,
 } from '../lib/socket';
 import { MATCH } from '../constants/modalTypes';
 import { config } from '../config';
@@ -190,17 +192,8 @@ const mapDispatchToProps = dispatch => {
 
         const body = await response.json();
         const { testResult, countPassed, isPassedAll } = body;
-        let intervalCountPassed = 0;
-        const intervalId = setInterval(() => {
-          if (Math.round(intervalCountPassed * 100) === countPassed * 100) {
-            dispatch(successSolutionSubmit(testResult, countPassed, isPassedAll, false));
-            clearInterval(intervalId);
-          } else {
-            intervalCountPassed += countPassed / 10;
-            dispatch(successSolutionSubmit(testResult, intervalCountPassed, isPassedAll));
-            emitSolutionSubmittedEvent(testResult, intervalCountPassed, isPassedAll, combatRoomKey);
-          }
-        }, 100);
+        dispatch(successSolutionSubmit(testResult, countPassed, isPassedAll, false));
+        emitSolutionSubmittedEvent(testResult, countPassed, isPassedAll, combatRoomKey);
       } catch(err) {
         console.log(err);
       }
@@ -259,8 +252,10 @@ const mapDispatchToProps = dispatch => {
 
         dispatch(successMatchEnd(body));
       } catch (error) {
-        
       }
+    },
+    handlePartnerGiveUpMatch() {
+
 
     },
     checkUserAuth() {
@@ -316,6 +311,11 @@ const mapDispatchToProps = dispatch => {
         dispatch(matchTimer(time));
       });
     },
+    subscribeMatchPartnerWinningEvent() {
+      subscribeMatchPartnerWinningEvent(matchResult => {
+        dispatch(successMatchEnd(matchResult));
+      });
+    },
     subscribeMatchPartnerSolutionSubmittedEvent() {
       subscribeMatchPartnerSolutionSubmittedEvent((matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll) => {
         dispatch(matchPartnerSolutionSubmitted(matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll));
@@ -347,8 +347,8 @@ const mapDispatchToProps = dispatch => {
       });
     },
     subscribeMatchStartEvent() {
-      subscribeMatchStartEvent((problem,matchId) => {
-        dispatch(matchStarted(problem, matchId));
+      subscribeMatchStartEvent((problem, matchId, matchTime) => {
+        dispatch(matchStarted(problem, matchId, matchTime));
       });
     },
     subscribeMatchPartnerKeyDownEvent() {
@@ -399,6 +399,9 @@ const mapDispatchToProps = dispatch => {
     },
     emitKeyUpEvent(combatRoomKey) {
       emitKeyUpEvent(combatRoomKey);
+    },
+    emitUserWinningEvent(matchResult, combatRoomKey) {
+      emitUserWinningEvent(matchResult, combatRoomKey);
     },
   };
 };

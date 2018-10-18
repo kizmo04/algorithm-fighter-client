@@ -33,7 +33,7 @@ class App extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { token, user, matchPartner, problem, isFetching, appStage, combatRoomKey, matchId, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent, subscribeMatchPartnerSolutionSubmittedEvent, subscribeMatchTimerEvent } = this.props;
+    const { token, user, matchPartner, matchResult, problem, isFetching, appStage, combatRoomKey, matchId, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent, subscribeMatchPartnerSolutionSubmittedEvent, subscribeMatchTimerEvent, emitUserWinningEvent, subscribeMatchPartnerWinningEvent } = this.props;
 
     if (!prevProps.token && prevProps.token !== token) {
       emitUserLoginEvent(user);
@@ -88,8 +88,11 @@ class App extends Component {
         subscribeMatchPartnerKeyUpEvent();
         subscribeMatchPartnerSolutionSubmittedEvent();
         subscribeMatchTimerEvent();
+        subscribeMatchPartnerWinningEvent();
         break;
       case APP_STAGE_MATCH_END:
+        emitUserWinningEvent(matchResult, combatRoomKey);
+        break;
       default:
         break;
     }
@@ -136,7 +139,7 @@ class App extends Component {
           <Route path="/matches/:match_id" render={({ match }) => {
             if (token) {
               return (
-                <CombatMatch matchId={match.params.match_id} onDidUpdate={updateMatchResult} isFetching={isFetching} matchTime={matchTime} combatRoomKey={combatRoomKey} code={code} token={token} {...userProps} {...matchPartnerProps} changeCode={changeCode} onSubmitButtonClick={submitSolution} emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 500)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 500)} matchMessage={matchMessage} problem={problem} />
+                <CombatMatch matchId={match.params.match_id} onDidUpdate={updateMatchResult} isFetching={isFetching} matchTime={matchTime} combatRoomKey={combatRoomKey} code={code} token={token} {...userProps} {...matchPartnerProps} changeCode={changeCode} onSubmitButtonClick={submitSolution} emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 500)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 1000)} matchMessage={matchMessage} problem={problem} />
                 );
               } else {
                 return <Redirect to="/" />;
@@ -152,7 +155,7 @@ class App extends Component {
         </Switch>
         <Modal isActive={isModalActive} onCloseButtonClick={closeModal}>
           {
-            modalType === AUTH ? <AuthModal {...authModalProps} /> : <MatchModal {...matchModalProps} />
+            modalType === AUTH ? <AuthModal {...authModalProps} /> : <MatchModal {...matchModalProps} isFetching={isFetching}/>
           }
         </Modal>
         {

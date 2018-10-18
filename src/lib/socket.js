@@ -20,6 +20,8 @@ import {
   MATCH_PARTNER_SOLUTION_SUBMITTED,
   SOLUTION_SUBMITTED,
   MATCH_TIMER,
+  USER_WINNING,
+  MATCH_PARTNER_WINNING,
 } from '../constants/socketEventTypes';
 import { config } from '../config';
 
@@ -63,6 +65,15 @@ const eventListenersMap = {};
 // 이것은 소켓이벤트 말고 각자 처리?
 // 혹은 서버에서 타이머를 돌리고 소켓 클라이언트들이 받아서 보여줌
 // 타이머 종료되면 서버에서 종료메세지 띄움.
+
+export function subscribeMatchPartnerWinningEvent(cb) {
+  const matchPartnerWinningEventListener = (matchResult) => {
+    cb(matchResult);
+  };
+  eventListenersMap[MATCH_PARTNER_WINNING] = matchPartnerWinningEventListener;
+
+  socket.on(MATCH_PARTNER_WINNING, matchPartnerWinningEventListener);
+}
 
 export function subscribeMatchTimerEvent(cb) {
   const matchTimerEventListener = (time) => {
@@ -122,9 +133,9 @@ export function emitKeyUpEvent(combatRoomKey) {
 }
 
 export function subscribeMatchStartEvent(cb) {
-  const matchStartEventListener = (problem, matchId) => {
+  const matchStartEventListener = (problem, matchId, matchTime) => {
     console.log('in match start on!')
-    cb(problem, matchId);
+    cb(problem, matchId, matchTime);
   };
 
   eventListenersMap[MATCH_START] = matchStartEventListener;
@@ -238,4 +249,8 @@ export function emitUserLoginEvent(user) {
 
 export function emitUserLogoutEvent() {
   socket.emit(USER_LOGOUT);
+}
+
+export function emitUserWinningEvent(matchResult, combatRoomKey) {
+  socket.emit(USER_WINNING, matchResult, combatRoomKey);
 }

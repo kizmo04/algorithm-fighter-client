@@ -185,7 +185,7 @@ export function matchProblemFetched(problem, matchId) {
   };
 }
 
-export function matchStarted(problem, matchId) {
+export function matchStarted(problem, matchId, matchTime) {
   return {
     type: MATCH_STARTED,
     appStage: APP_STAGE_MATCH_STARTED,
@@ -195,6 +195,7 @@ export function matchStarted(problem, matchId) {
     modalType: '',
     isMatchStarted: true,
     matchId,
+    matchTime,
   };
 }
 

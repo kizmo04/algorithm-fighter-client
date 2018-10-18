@@ -12,7 +12,6 @@ import {
 } from '../../constants/modalTypes';
 import './MatchModal.scss';
 
-
 class MatchModal extends Component {
   constructor(props) {
     super(props);
@@ -44,10 +43,6 @@ class MatchModal extends Component {
 
   render() {
     const { modalMessage, appStage, matchPartner, matchResult, user, isFetching } = this.props;
-
-    if (appStage === APP_STAGE_MATCH_END && !isFetching) {
-      console.log(matchResult.winner_id === user._id ? user.userName : matchPartner.userName)
-    }
     return (
       <div className="modal-card">
       <header className="modal-card-head">
@@ -59,11 +54,11 @@ class MatchModal extends Component {
         appStage === APP_STAGE_FIND_MATCH_PARTNER || appStage === APP_STAGE_PENDING_MATCH_ACCEPTANCE ? <span className="subtitle is-small">{modalMessage}</span> :
         appStage === APP_STAGE_RECEIVING_MATCH_INVITATION ? (
           <div className="columns">
-            <div className="column is-two-third">
-              <figure className="image is-64x64 user-profile">
+            <div className="column is-two-third match-modal invitation-message-container">
+              <figure className="image is-64x64 user-profile-image match-modal">
                 <img className="is-rounded" src={matchPartner.profileImageUrl} alt="" />
               </figure>
-              <span className="subtitle is-small">{matchPartner.userName}의 결투신청</span>
+              <span className="subtitle is-small match-modal-message invitation">{matchPartner.userName}의 결투신청</span>
             </div>
             <div className="column is-one-third">
               <button className="button is-small is-fullwidth is-danger invitaion-button" onClick={this.handleAcceptButtonClick}>수락</button>
@@ -80,16 +75,25 @@ class MatchModal extends Component {
               <button className="button is-small" onClick={this.handleRetryButtonClick}>다시 찾기</button>
             </div>
           </div>
-        ) : 
-        appStage === APP_STAGE_MATCH_PREPARATION || APP_STAGE_MATCH_PROBLEM_FETCHED ? (
-        <span className="subtitle is-small">{modalMessage}</span>
         ) :
-        appStage === APP_STAGE_MATCH_END && !isFetching ? (
-          <div>
-            <span className="subtitle is-small">{matchResult.winner_id === user._id ? user.userName : matchPartner.userName} Win</span>
-            <span className="subtitle is-small">{matchResult.winner_id === user._id ? user.userName : matchPartner.userName} Lose</span>
-            <Link className="button is-small is-white" to="/">메인으로</Link>
-            <Link className="button is-small is-danger" to={`/users/${user._id}/matches`}>지난 전투 보기</Link>
+        appStage === APP_STAGE_MATCH_PREPARATION || appStage === APP_STAGE_MATCH_PROBLEM_FETCHED ? (
+          <span className="subtitle is-small">{modalMessage}</span>
+        ) :
+        appStage === APP_STAGE_MATCH_END ? (
+          <div className="columns is-multiline match-modal match-end">
+            <div className="column is-half match-modal match-end">
+            <div className="subtitle is-danger is-small match-modal match-end winner-title">{matchResult.winner.user_name} Win!</div>
+            </div>
+            <div className="column is-half match-modal match-end">
+            <div className="subtitle is-small match-modal match-end loser-title">{matchResult.loser.user_name} Lose!</div>
+            </div>
+            <div className="column is-half match-modal match-end">
+            <Link onClick={this.handleOnCloseButtonClick} className="button is-fullwidth is-small is-white match-modal match-end" to="/">메인으로</Link>
+            </div>
+            <div className="column is-half match-modal match-end">
+            <Link onClick={this.handleOnCloseButtonClick} className="button is-fullwidth is-small is-danger match-modal match-end" to={`/users/${user._id}/matches`}>지난 전투 보기</Link>
+
+            </div>
           </div>
         ) : null
       }

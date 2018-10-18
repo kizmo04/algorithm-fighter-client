@@ -1,5 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Controlled as CodeMirror } from "react-codemirror2";
+import MarkDown from 'react-markdown';
+import { toMatchTimeFormatString } from '../../lib/date';
 import "../../../node_modules/codemirror/lib/codemirror.css";
 import "../../../node_modules/codemirror/theme/tomorrow-night-bright.css";
 import "../../../node_modules/codemirror/mode/xml/xml";
@@ -12,6 +14,7 @@ class CombatMatch extends Component {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleClickSubmit = this.handleClickSubmit.bind(this);
+    this.timeOutId = null;
   }
 
   componentDidUpdate(prevProps) {
@@ -22,22 +25,26 @@ class CombatMatch extends Component {
   }
 
   handleKeyDown (editor, e) {
+    if (this.timeOutId) {
+      clearTimeout(this.timeOutId);
+    }
+    this.timeOutId = setTimeout(() => {
+      this.props.emitKeyUpEvent();
+    }, 500);
     this.props.emitKeyDownEvent();
   }
 
   handleKeyUp (editor, e) {
-    this.props.emitKeyUpEvent();
   }
 
   handleClickSubmit (e) {
     const { user, problem, token, onSubmitButtonClick, code, combatRoomKey } = this.props;
-    console.log('click submit')
     onSubmitButtonClick(user._id, code, problem._id, token, combatRoomKey);
   }
   render() {
     const { isFetching, matchPartner, isMatchPartnerKeyPress, matchMessage, code, changeCode, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, isPassedAll, countPassed, testResult, matchTime } = this.props;
     const { description, title } = this.props.problem;
-    const { profileImageUrl, email } = this.props.user;
+    const { profileImageUrl, email, userName } = this.props.user;
     const options = {
       mode: "javascript",
       theme: "tomorrow-night-bright",
@@ -46,31 +53,42 @@ class CombatMatch extends Component {
     };
     const matchPartnerGauge = matchPartnerCountPassed ? Math.round(matchPartnerCountPassed / matchPartnerTestResult.length * 100) : 0;
     const userGauge = countPassed ? Math.round(countPassed / testResult.length * 100) : 0;
-    console.log(userGauge)
+    var i = 0;
     return (
       <Fragment>
         <div className="columns">
           <div className="column is-full user-status-bar">
             <div className="columns is-2">
               <div className="column is-two-fifths user-status-box">
-                <figure className={`image is-64x64 user-profile ${ isMatchPartnerKeyPress ? 'blinking' : '' }`}>
-                  <img className="is-rounded" src={matchPartner.profileImageUrl} alt="" />
+                <figure className='image is-48x48 user-profile-image combat-match-user-status partner'>
+                  <img className="" src={matchPartner.profileImageUrl} alt="" />
                 </figure>
-                <h3 className={`subtitle is-small user-email ${ isMatchPartnerKeyPress ? 'blinking' : '' }`}>{ matchPartner.email }</h3>
-                <progress class={`progress is-danger is-large ${ isMatchPartnerKeyPress ? 'blinking' : '' }`} value={matchPartnerGauge} max="100"></progress>
-                <span className="subtitle is-medium">{matchPartnerGauge}%</span>
+                <h3 className='button is-outlined is-info is-medium user-username'>
+                  { matchPartner.userName }
+                  <div id={`${ isMatchPartnerKeyPress ? 'wave' : ''}`}>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                  </div>
+                </h3>
+                <progress class={'progress is-info is-small'} value={matchPartnerGauge} max="100"></progress>
+                <span className="partner-gauge-percent">{matchPartnerGauge}%</span>
               </div>
               <div className="column is-one-fifths">
-                <h3>상대가 테스트를 { Math.ceil(matchPartnerCountPassed) }개 통과했습니다.</h3>
-                <span>{matchTime}</span>
+                <i class="material-icons clock">schedule</i>
+                <p className="subtitle is-large">
+                {toMatchTimeFormatString(matchTime)} left
+                </p>
               </div>
               <div className="column is-two-fifths user-status-box">
-                <h3 className="subtitle is-small user-email">{ email }</h3>
-                <figure className="image is-64x64 user-profile">
-                  <img className="is-rounded" src={profileImageUrl} alt="" />
+                <figure className="image is-48x48 user-profile-image combat-match-user-status">
+                  <img className="" src={profileImageUrl} alt="" />
                 </figure>
-                <progress class="progress is-info is-large user-gauge" value={userGauge} max="100"></progress>
-                <span className="subtitle is-medium">{userGauge}%</span>
+                <h3 className="button is-outlined is-danger is-medium user-username">
+                  {userName}
+                </h3>
+                <progress class="progress is-danger is-small user-gauge" value={userGauge} max="100"></progress>
+                <span className="user-gauge-percent">{userGauge}%</span>
               </div>
             </div>
           </div>
@@ -78,11 +96,18 @@ class CombatMatch extends Component {
         <div className="columns is-2">
           <div className="column is-half">
             <h2 className="title">{title}</h2>
-            <p className="subtitle">{description}</p>
+            <MarkDown className="markdown" source={description}/>
           </div>
           <div className="column is-half">
             <CodeMirror options={options} value={code} onBeforeChange={changeCode} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} />
-            <button onClick={this.handleClickSubmit} className={`button is-danger is-large ${isFetching ? 'is-loading' : ''}`} type="submit">Attack!</button>
+            <div className="columns">
+              <div className="column is-half">
+                <button onClick={this.handleClickSubmit} className={`button is-fullwidth is-info is-outlined is-medium ${isFetching ? 'is-loading' : ''}`} type="submit">Surrender</button>
+              </div>
+              <div className="column is-half">
+                <button onClick={this.handleClickSubmit} className={`button is-fullwidth is-danger is-outlined is-medium ${isFetching ? 'is-loading' : ''}`} type="submit">Attack!</button>
+              </div>
+            </div>
           </div>
         </div>
       </Fragment>

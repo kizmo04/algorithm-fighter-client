@@ -148,6 +148,7 @@ function reducer(state = initialState, action) {
         modalType: action.modalType,
         isMatchStarted: action.isMatchStarted,
         matchId: action.matchId,
+        matchTime: action.matchTime,
       });
     case MATCH_PREPARATION:
       return Object.assign({}, state, {

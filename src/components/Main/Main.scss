@@ -5,3 +5,28 @@
 .main-subtitle {
   font-size: 2rem;
 }
+
+.hero.is-large {
+  .hero-body {
+    overflow: hidden;
+    padding-top: 10rem;
+    padding-bottom: 24rem;
+    background-image: url('https://images.pexels.com/photos/163403/box-sport-men-training-163403.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
+    background-position: center top;
+  }
+}
+
+.hero .hero-body .container {
+  text-align: left;
+}
+
+.title.main-title {
+  margin-bottom: 2rem;
+}
+
+.subtitle.main-subtitle {
+  font-size: 1.3rem;
+  margin-bottom: 3.4rem;
+}
+
+

@@ -12,7 +12,7 @@ class UserDetail extends Component {
       <div className="columns is-multiline">
         <div className="column is-full">
           <h2 className="title is-small">Hi, {user.name || userName}</h2>
-          <figure className="image is-64x64 user-profile">
+          <figure className="image is-64x64 user-detail-profile">
             <img className="is-rounded" src={profileImageUrl} alt="" />
           </figure>
           <div className="subtitle is-small">{userName || user.name}</div>

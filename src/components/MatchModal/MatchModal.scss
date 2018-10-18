@@ -2,6 +2,20 @@
   margin-bottom: 5px;
 }
 
-.user-profile {
+.user-profile-image.match-modal {
   margin-right: 10px;
+  display: inline-block;
+}
+
+.match-modal.invitation-message-container {
+  display: flex;
+  align-items: center;
+}
+
+.winner-title {
+  color: hsl(348, 100%, 61%);
+}
+
+.loser-title {
+
 }
