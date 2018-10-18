@@ -4,8 +4,23 @@ $gap: 100px;
 $text: hsl(0, 0%, 98%);
 $background: #070707;
 $body-background-color: #070707;
+$code-background: #070707;
+$pre-background: #070707;
+$hr-background-color: #070707;
+$title-color: hsl(0, 0%, 98%);
+$subtitle-color: hsl(0, 0%, 98%);
+$box-background-color: #070707;
+$modal-card-head-background-color: hsl(0, 0%, 20%);
+$modal-card-head-border-bottom: hsl(0, 0%, 20%);
+$modal-card-body-background-color: hsl(0, 0%, 20%);
+$modal-card-foot-border-top: hsl(0, 0%, 20%);
+
+// $link: hsl(0, 0%, 96%);
+$link: hsl(348, 100%, 61%);
+$border-hover: white;
 
 @import 'bulma';
+@import '~bulma-timeline';
 
 body {
   margin: 0;

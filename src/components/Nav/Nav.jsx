@@ -39,16 +39,14 @@ class Nav extends Component {
           {token ? (
             <div className="navbar-end">
               <button
-                className="navbar-item button is-success is-small is-outlined"
+                className="navbar-item button is-link is-small is-outlined"
                 onClick={this.handleOnLogoutButtonClick}
               >
                 Log out
               </button>
-              <figure className="image is-64x64">
-                <Link to={`/users/${user._id}`}>
-                  <img className="is-rounded" src={user.profileImageUrl} alt="" />
-                </Link>
-              </figure>
+              <Link to={`/users/${user._id}`} className="navbar-item is-small button is-light is-outlined">
+                {user.email}
+              </Link>
             </div>
           ) : (
             <div className="navbar-end">

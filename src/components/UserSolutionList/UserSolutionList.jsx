@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Controlled as CodeMirror } from "react-codemirror2";
+import { toNewFormatString } from '../../lib/date';
 import "../../../node_modules/codemirror/lib/codemirror.css";
 import "../../../node_modules/codemirror/theme/tomorrow-night-bright.css";
 import "../../../node_modules/codemirror/mode/xml/xml";
@@ -16,9 +17,16 @@ class UserSolutionList extends Component {
     onDidMount(user._id, token);
   }
 
-  handleOnClick(e) {
-    this.props.expandAccordion(e.target.dataset.index); 
+  toggleAccordion(e) {
+    const { expandAccordion, collapseAccordion, expandedAccordionIndex } = this.props;
+    const index = parseInt(e.target.dataset.index);
+    if (expandedAccordionIndex === index) {
+      collapseAccordion();
+    } else {
+      expandAccordion(index);
+    }
   }
+
   render() {
     const options = {
       mode: "javascript",
@@ -26,33 +34,45 @@ class UserSolutionList extends Component {
       lineNumbers: true,
       lineWrapping: true,
       autofocus: true,
+      autoRefresh: true,
       readOnly: true,
     };
     const { solutions, expandedAccordionIndex } = this.props;
+
+    console.log(solutions[0]);
+
     return (
       <Fragment>
         {
           solutions.map((solution, i) => (
             <div className="columns">
-              <div className="column is-one-quarter"></div>
-              <div className="column is-half">
-                <div key={i} className="box solution">
+              <div className="column"></div>
+              <div className="column is-10">
+                <div key={i} className="box solution-box">
                   <ul>
                     <li className="entry">
-                      <p className="subtitle is-small entry-title" data-index={i} onClick={this.handleOnClick.bind(this)} ref={this.isExpanded}>{solution.problem_title}</p>
+                      <div className="columns entry-header">
+                        <div className="column is-two-third">
+                          <p className="subtitle is-small entry-title" data-index={i} onClick={this.toggleAccordion.bind(this)} ref={this.isExpanded}>{solution.problem_title}</p>
+                        </div>
+                        <div className="column is-one-third">
+                          <p className="subtitle is-small">{toNewFormatString(solution.created_at)}</p>
+                        </div>
+                      </div>
                       <ul className={`entry-content ${parseInt(expandedAccordionIndex) === i ? 'is-expand' : ''}`}>
-                        <li className="created-at">
-                          <p className="subtitle is-small">submitted at: {solution.created_at}</p>
-                        </li>
                         <li className="code">
-                          <CodeMirror options={options} value={solution.code} />
+                          <CodeMirror
+                            options={options}
+                            value={solution.code}
+                            editorDidMount={editor => { editor.refresh() }}
+                          />
                         </li>
                       </ul>
                     </li>
                   </ul>
                 </div>
               </div>
-              <div className="column is-one-quarter"></div>
+              <div className="column"></div>
             </div>
           ))
         }
