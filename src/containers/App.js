@@ -29,6 +29,8 @@ import {
   successUserPastMatchResult,
   successUserPastSolutionList,
   accordionExpanded,
+  accordionCollapsed,
+  successMatchEnd,
 } from '../actions';
 import {
   subscribeMatchTimerEvent,
@@ -191,6 +193,7 @@ const mapDispatchToProps = dispatch => {
         let intervalCountPassed = 0;
         const intervalId = setInterval(() => {
           if (Math.round(intervalCountPassed * 100) === countPassed * 100) {
+            dispatch(successSolutionSubmit(testResult, countPassed, isPassedAll, false));
             clearInterval(intervalId);
           } else {
             intervalCountPassed += countPassed / 10;
@@ -238,6 +241,28 @@ const mapDispatchToProps = dispatch => {
         console.log(error);
       }
     },
+    async updateMatchResult (token, userId, matchId) {
+      try {
+        const response = await fetch(`${ROOT}/api/matches/${matchId}`, {
+          method: 'PUT',
+          mode: 'cors',
+          body: JSON.stringify({
+            winner_id: userId
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const body = await response.json();
+
+        dispatch(successMatchEnd(body));
+      } catch (error) {
+        
+      }
+
+    },
     checkUserAuth() {
       if (localStorage['algorithmFighter']) {
         const token = JSON.parse(localStorage['algorithmFighter']).token;
@@ -263,6 +288,9 @@ const mapDispatchToProps = dispatch => {
     },
     expandAccordion(index) {
       dispatch(accordionExpanded(index));
+    },
+    collapseAccordion(index) {
+      dispatch(accordionCollapsed(index));
     },
     changeCode(editor, data, code) {
       dispatch(codeChanged(code));

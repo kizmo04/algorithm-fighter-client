@@ -24,6 +24,7 @@ import {
   SUCCESS_USER_PAST_SOLUTION_LIST,
   ACCORDION_EXPANDED,
   ACCORDION_COLLAPSED,
+  SUCCESS_MATCH_END,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -38,6 +39,8 @@ import {
   APP_STAGE_MATCH_PREPARATION,
   APP_STAGE_MATCH_PROBLEM_FETCHED,
   APP_STAGE_MATCH_STARTED,
+  APP_STAGE_MATCH_END,
+  APP_STAGE_MATCH_SUSPENDED,
 } from '../constants/modalTypes';
 import {
   MESSAGE_FIND_MATCH_PARTNER,
@@ -118,7 +121,7 @@ export function matchModalOpen() {
 export function pendingMatchAcceptance(matchPartner) {
   return {
     type: PENDING_MATCH_ACCEPTANCE,
-    modalMessage: `${matchPartner.email}님의 수락을 기다리는 중 입니다`,
+    modalMessage: `${matchPartner.userName}의 수락을 기다리는 중 입니다`,
     appStage: APP_STAGE_PENDING_MATCH_ACCEPTANCE,
     matchPartner,
   };
@@ -211,13 +214,13 @@ export function matchPartnerKeyUp() {
   };
 }
 
-export function successSolutionSubmit(testResult, countPassed, isPassedAll) {
+export function successSolutionSubmit(testResult, countPassed, isPassedAll, isFetching = true) {
   return {
     type: SUCCESS_SOLUTION_SUBMIT,
     testResult,
     countPassed,
     isPassedAll,
-    isFetching: false,
+    isFetching,
   };
 }
 
@@ -269,5 +272,22 @@ export function accordionExpanded(index) {
   return {
     type: ACCORDION_EXPANDED,
     expandedAccordionIndex: index,
+  };
+}
+
+export function accordionCollapsed() {
+  return {
+    type: ACCORDION_COLLAPSED,
+    expandedAccordionIndex: -1,
+  };
+}
+
+export function successMatchEnd(matchResult) {
+  return {
+    type: SUCCESS_MATCH_END,
+    appStage: APP_STAGE_MATCH_END,
+    matchResult,
+    isModalActive: true,
+    modalType: MATCH,
   };
 }

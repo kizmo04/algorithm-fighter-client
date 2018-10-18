@@ -14,6 +14,13 @@ class CombatMatch extends Component {
     this.handleClickSubmit = this.handleClickSubmit.bind(this);
   }
 
+  componentDidUpdate(prevProps) {
+    const { isPassedAll, onDidUpdate, token, user, matchId } = this.props;
+    if (!prevProps.isPassedAll && isPassedAll) {
+      onDidUpdate(token, user._id, matchId);
+    }
+  }
+
   handleKeyDown (editor, e) {
     this.props.emitKeyDownEvent();
   }
@@ -28,7 +35,7 @@ class CombatMatch extends Component {
     onSubmitButtonClick(user._id, code, problem._id, token, combatRoomKey);
   }
   render() {
-    const { isFetching, matchPartner, isMatchPartnerKeyPress, matchMessage, code, changeCode, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, countPassed, testResult, matchTime } = this.props;
+    const { isFetching, matchPartner, isMatchPartnerKeyPress, matchMessage, code, changeCode, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, isPassedAll, countPassed, testResult, matchTime } = this.props;
     const { description, title } = this.props.problem;
     const { profileImageUrl, email } = this.props.user;
     const options = {
@@ -49,21 +56,21 @@ class CombatMatch extends Component {
                 <figure className={`image is-64x64 user-profile ${ isMatchPartnerKeyPress ? 'blinking' : '' }`}>
                   <img className="is-rounded" src={matchPartner.profileImageUrl} alt="" />
                 </figure>
-                <h3 className={`title is-size-3 user-email ${ isMatchPartnerKeyPress ? 'blinking' : '' }`}>{ matchPartner.email }</h3>
+                <h3 className={`subtitle is-small user-email ${ isMatchPartnerKeyPress ? 'blinking' : '' }`}>{ matchPartner.email }</h3>
                 <progress class={`progress is-danger is-large ${ isMatchPartnerKeyPress ? 'blinking' : '' }`} value={matchPartnerGauge} max="100"></progress>
-                <span className="subtitle is-size-3">{matchPartnerGauge}%</span>
+                <span className="subtitle is-medium">{matchPartnerGauge}%</span>
               </div>
               <div className="column is-one-fifths">
                 <h3>상대가 테스트를 { Math.ceil(matchPartnerCountPassed) }개 통과했습니다.</h3>
                 <span>{matchTime}</span>
               </div>
               <div className="column is-two-fifths user-status-box">
-                <h3 className="title is-size-3 user-email">{ email }</h3>
+                <h3 className="subtitle is-small user-email">{ email }</h3>
                 <figure className="image is-64x64 user-profile">
                   <img className="is-rounded" src={profileImageUrl} alt="" />
                 </figure>
                 <progress class="progress is-info is-large user-gauge" value={userGauge} max="100"></progress>
-                <span className="subtitle is-size-3">{userGauge}%</span>
+                <span className="subtitle is-medium">{userGauge}%</span>
               </div>
             </div>
           </div>

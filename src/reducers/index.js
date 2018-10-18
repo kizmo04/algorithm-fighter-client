@@ -24,6 +24,7 @@ import {
   SUCCESS_USER_PAST_SOLUTION_LIST,
   ACCORDION_EXPANDED,
   ACCORDION_COLLAPSED,
+  SUCCESS_MATCH_END,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -52,6 +53,7 @@ const initialState = {
   matchResultList: [],
   solutionList: [],
   expandedAccordionIndex: -1,
+  matchResult: {},
 };
 
 function reducer(state = initialState, action) {
@@ -203,6 +205,17 @@ function reducer(state = initialState, action) {
     case ACCORDION_EXPANDED:
       return Object.assign({}, state, {
         expandedAccordionIndex: action.expandedAccordionIndex,
+      });
+    case ACCORDION_COLLAPSED:
+      return Object.assign({}, state, {
+        expandedAccordionIndex: action.expandedAccordionIndex,
+      });
+    case SUCCESS_MATCH_END:
+      return Object.assign({}, state, {
+        matchResult: action.matchResult,
+        appStage: action.appStage,
+        modalType: action.modalType,
+        isModalActive: action.isModalActive,
       });
     default:
       return state;
