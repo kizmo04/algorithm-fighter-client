@@ -69,15 +69,7 @@ import {
 import { MATCH, APP_STAGE_MATCH_STARTED } from '../constants/modalTypes';
 import { config } from '../config';
 
-const { JWT_SECRET } = config;
-
-let ROOT;
-
-if (process.env.NODE_ENV === 'development') {
-  ROOT = 'algorithm-fighter-development.34ntf6wspi.ap-northeast-2.elasticbeanstalk.com';
-} else if (process.env.NODE_ENV === 'production') {
-  ROOT = 'algorithm-fighter-development.34ntf6wspi.ap-northeast-2.elasticbeanstalk.com';
-}
+const { JWT_SECRET, ROOT } = config;
 
 library.add(fab);
 
