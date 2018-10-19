@@ -38,7 +38,10 @@ if (process.env.NODE_ENV === 'development') {
   ROOT = 'http://api.kizmo04.com';
 }
 
-const socket = io(ROOT);
+const socket = io(ROOT, {
+  reconnection: true,
+  transports: ['websocket', 'polling']
+});
 
 const eventListenersMap = {};
 
