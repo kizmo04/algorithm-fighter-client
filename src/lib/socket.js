@@ -35,7 +35,7 @@ let ROOT;
 if (process.env.NODE_ENV === 'development') {
   ROOT = 'http://api-dev.kizmo04.com';
 } else if (process.env.NODE_ENV === 'production') {
-  ROOT = 'https://api.kizmo04.com';
+  ROOT = 'http://api.kizmo04.com';
 }
 
 const socket = io(ROOT);
