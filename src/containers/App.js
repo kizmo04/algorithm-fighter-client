@@ -74,9 +74,9 @@ const { JWT_SECRET } = config;
 let ROOT;
 
 if (process.env.NODE_ENV === 'development') {
-  ROOT = 'algorithm-fighter-development.34ntf6wspi.ap-northeast-2.elasticbeanstalk.com';
+  ROOT = 'http://api-dev.kizmo04.com';
 } else if (process.env.NODE_ENV === 'production') {
-  ROOT = 'algorithm-fighter-development.34ntf6wspi.ap-northeast-2.elasticbeanstalk.com';
+  ROOT = 'https://api.kizmo04.com';
 }
 
 library.add(fab);

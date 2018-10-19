@@ -26,9 +26,17 @@ import {
   MATCH_PARTNER_GIVE_UP,
   USER_SOCKET_INIT,
 } from '../constants/socketEventTypes';
-import { config } from '../config';
+// import { config } from '../config';
 
-const { ROOT } = config;
+// const { ROOT } = config;
+
+let ROOT;
+
+if (process.env.NODE_ENV === 'development') {
+  ROOT = 'http://api-dev.kizmo04.com';
+} else if (process.env.NODE_ENV === 'production') {
+  ROOT = 'https://api.kizmo04.com';
+}
 
 const socket = io(ROOT);
 

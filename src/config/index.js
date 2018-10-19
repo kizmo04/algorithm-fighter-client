@@ -1,4 +1,4 @@
-const REACT_APP_DEV_ROOT='http://localhost:5000';
+const REACT_APP_DEV_ROOT='http://api-dev.kizmo04.com';
 const REACT_APP_FIREBASE_API_KEY='AIzaSyA8tjWN6Il51ou3WdpR_zXkzWvM5E0YxJQ';
 const REACT_APP_FIREBASE_AUTO_DOMAIN='codebattle-7fb78.firebaseapp.com';
 const REACT_APP_FIREBASE_DATABASE_URL='https://codebattle-7fb78.firebaseio.com';
