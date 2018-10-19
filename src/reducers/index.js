@@ -25,11 +25,15 @@ import {
   ACCORDION_EXPANDED,
   ACCORDION_COLLAPSED,
   SUCCESS_MATCH_END,
+  APP_STAGE_RESET,
+  USER_GIVE_UP_MATCH,
+  MATCH_PARTNER_GIVE_UP_MATCH,
 } from '../constants/actionTypes';
 
 const initialState = {
   token: '',
   user: {},
+  isHost: true,
   isModalActive: false,
   modalType: '',
   modalMessage: '',
@@ -58,6 +62,15 @@ const initialState = {
 
 function reducer(state = initialState, action) {
   switch(action.type) {
+    case APP_STAGE_RESET:
+      return Object.assign({}, state, {
+        ...initialState,
+        token: action.token,
+        user: action.user,
+        appStage: action.appStage,
+        solutionList: action.solutionList,
+        matchResultList: action.matchResultList,
+      });
     case MATCH_TIMER:
       return Object.assign({}, state, {
         matchTime: action.matchTime,
@@ -100,6 +113,7 @@ function reducer(state = initialState, action) {
         isModalActive: action.isModalActive,
         modalMessage: action.modalMessage,
         appStage: action.appStage,
+        isHost: true
       });
     case MODAL_CLOSE:
       return Object.assign({}, state, {
@@ -127,6 +141,7 @@ function reducer(state = initialState, action) {
         matchPartner: action.matchPartner,
         appStage: action.appStage,
         combatRoomKey: action.combatRoomKey,
+        isHost: false
       });
     case MATCH_PARTNER_UNAVAILABLE:
       return Object.assign({}, state, {
@@ -162,7 +177,7 @@ function reducer(state = initialState, action) {
         appStage: action.appStage,
         modalMessage: action.modalMessage,
         problem: action.problem,
-        matchId: action.matchId,
+        matchId: action.matchId
       });
     case MATCH_PARTNER_KEY_DOWN:
       return Object.assign({}, state, {
@@ -217,6 +232,20 @@ function reducer(state = initialState, action) {
         appStage: action.appStage,
         modalType: action.modalType,
         isModalActive: action.isModalActive,
+      });
+    case USER_GIVE_UP_MATCH:
+      return Object.assign({}, state, {
+        appStage: action.appStage,
+        modalMessage: action.modalMessage,
+        isMatchStarted: action.isMatchStarted,
+        isModalActive: action.isModalActive,
+      });
+    case MATCH_PARTNER_GIVE_UP_MATCH:
+      return Object.assign({}, state, {
+        appStage: action.appStage,
+        isModalActive: action.isModalActive,
+        modalType: action.modalType,
+        modalMessage: action.modalMessage,
       });
     default:
       return state;

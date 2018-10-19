@@ -12,9 +12,9 @@ class CombatMatch extends Component {
   constructor(props) {
     super(props);
     this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleClickSubmit = this.handleClickSubmit.bind(this);
     this.timeOutId = null;
+    this.handleOnSurrenderButtonClick = this.handleOnSurrenderButtonClick.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -34,7 +34,9 @@ class CombatMatch extends Component {
     this.props.emitKeyDownEvent();
   }
 
-  handleKeyUp (editor, e) {
+  handleOnSurrenderButtonClick() {
+    const { onSurrenderButtonClick } = this.props;
+    onSurrenderButtonClick();
   }
 
   handleClickSubmit (e) {
@@ -63,7 +65,7 @@ class CombatMatch extends Component {
                 <figure className='image is-48x48 user-profile-image combat-match-user-status partner'>
                   <img className="" src={matchPartner.profileImageUrl} alt="" />
                 </figure>
-                <h3 className='button is-outlined is-info is-medium user-username'>
+                <h3 className={`button is-info is-medium user-username ${matchPartnerIsPassedAll ? '' : 'is-outlined is-win'}`}>
                   { matchPartner.userName }
                   <div id={`${ isMatchPartnerKeyPress ? 'wave' : ''}`}>
                     <span class="dot"></span>
@@ -72,7 +74,7 @@ class CombatMatch extends Component {
                   </div>
                 </h3>
                 <progress class={'progress is-info is-small'} value={matchPartnerGauge} max="100"></progress>
-                <span className="partner-gauge-percent">{matchPartnerGauge}%</span>
+                <span className="partner-gauge-percent has-text-info">{matchPartnerGauge}%</span>
               </div>
               <div className="column is-one-fifths">
                 <i class="material-icons clock">schedule</i>
@@ -84,11 +86,11 @@ class CombatMatch extends Component {
                 <figure className="image is-48x48 user-profile-image combat-match-user-status">
                   <img className="" src={profileImageUrl} alt="" />
                 </figure>
-                <h3 className="button is-outlined is-danger is-medium user-username">
+                <h3 className={`button is-danger is-medium user-username ${isPassedAll ? '' : 'is-outlined is-win'}`}>
                   {userName}
                 </h3>
                 <progress class="progress is-danger is-small user-gauge" value={userGauge} max="100"></progress>
-                <span className="user-gauge-percent">{userGauge}%</span>
+                <span className="user-gauge-percent has-text-danger">{userGauge}%</span>
               </div>
             </div>
           </div>
@@ -99,10 +101,10 @@ class CombatMatch extends Component {
             <MarkDown className="markdown" source={description}/>
           </div>
           <div className="column is-half">
-            <CodeMirror options={options} value={code} onBeforeChange={changeCode} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} />
+            <CodeMirror options={options} value={code} onBeforeChange={changeCode} onKeyDown={this.handleKeyDown} />
             <div className="columns">
               <div className="column is-half">
-                <button onClick={this.handleClickSubmit} className={`button is-fullwidth is-info is-outlined is-medium ${isFetching ? 'is-loading' : ''}`} type="submit">Surrender</button>
+                <button onClick={this.handleOnSurrenderButtonClick} className={`button is-fullwidth is-info is-outlined is-medium ${isFetching ? 'is-loading' : ''}`} type="submit">Surrender</button>
               </div>
               <div className="column is-half">
                 <button onClick={this.handleClickSubmit} className={`button is-fullwidth is-danger is-outlined is-medium ${isFetching ? 'is-loading' : ''}`} type="submit">Attack!</button>

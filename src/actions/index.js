@@ -25,10 +25,14 @@ import {
   ACCORDION_EXPANDED,
   ACCORDION_COLLAPSED,
   SUCCESS_MATCH_END,
+  APP_STAGE_RESET,
+  USER_GIVE_UP_MATCH,
+  MATCH_PARTNER_GIVE_UP_MATCH,
 } from '../constants/actionTypes';
 import {
   AUTH,
   MATCH,
+  APP_STAGE_INITIAL,
   APP_STAGE_FIND_MATCH_PARTNER,
   APP_STAGE_PENDING_MATCH_ACCEPTANCE,
   APP_STAGE_RECEIVING_MATCH_INVITATION,
@@ -41,6 +45,7 @@ import {
   APP_STAGE_MATCH_STARTED,
   APP_STAGE_MATCH_END,
   APP_STAGE_MATCH_SUSPENDED,
+  APP_STAGE_USER_GIVE_UP_MATCH,
 } from '../constants/modalTypes';
 import {
   MESSAGE_FIND_MATCH_PARTNER,
@@ -50,6 +55,8 @@ import {
   MESSAGE_MATCH_PROBLEM_FETCHED,
   MESSAGE_MATCH_PARTNER_KEY_DOWN,
   MESSAGE_MATCH_PARTNER_SOLUTION_SUBMITTED,
+  MESSAGE_USER_GIVE_UP_MATCH,
+  MESSAGE_MATCH_PARTNER_GIVE_UP_MATCH,
 } from '../constants/messages';
 
 export function successUserAuthentication(token, user) {
@@ -101,10 +108,10 @@ export function refuseMatchInvitation() {
 export function acceptMatchInvitation() {
   return {
     type: ACCEPT_MATCH_INVITATION,
-    isModalActive: false,
-    modalType: '',
-    modalMessage: '',
+    modalMessage: MESSAGE_MATCH_PREPARATION,
+    isModalActive: true,
     appStage: APP_STAGE_ACCEPT_MATCH_INVITATION,
+    modalType: MATCH,
   };
 }
 
@@ -181,7 +188,7 @@ export function matchProblemFetched(problem, matchId) {
     appStage: APP_STAGE_MATCH_PROBLEM_FETCHED,
     modalMessage: MESSAGE_MATCH_PROBLEM_FETCHED,
     problem,
-    matchId,
+    matchId
   };
 }
 
@@ -290,5 +297,36 @@ export function successMatchEnd(matchResult) {
     matchResult,
     isModalActive: true,
     modalType: MATCH,
+  };
+}
+
+export function appStageReset(appStage, token, user, matchResultList, solutionList) {
+  return {
+    type: APP_STAGE_RESET,
+    appStage: APP_STAGE_INITIAL,
+    token,
+    user,
+    matchResultList,
+    solutionList,
+  };
+}
+
+export function userGiveUpMatch() {
+  return {
+    type: USER_GIVE_UP_MATCH,
+    appStage: APP_STAGE_USER_GIVE_UP_MATCH,
+    modalMessage: MESSAGE_USER_GIVE_UP_MATCH,
+    isMatchStarted: false,
+    isModalActive: true,
+  };
+}
+
+export function matchPartnerMatchGiveUp() {
+  return {
+    type: MATCH_PARTNER_GIVE_UP_MATCH,
+    appStage: APP_STAGE_MATCH_SUSPENDED,
+    isModalActive: true,
+    modalType: MATCH,
+    modalMessage: MESSAGE_MATCH_PARTNER_GIVE_UP_MATCH,
   };
 }

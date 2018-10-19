@@ -31,8 +31,12 @@ import {
   accordionExpanded,
   accordionCollapsed,
   successMatchEnd,
+  appStageReset,
+  matchPartnerMatchGiveUp,
+  userGiveUpMatch,
 } from '../actions';
 import {
+  subscribeMatchPartnerGiveUpEvent,
   subscribeMatchPartnerWinningEvent,
   subscribeMatchTimerEvent,
   subscribePendingMatchAcceptanceEvent,
@@ -59,8 +63,10 @@ import {
   emitKeyUpEvent,
   emitSolutionSubmittedEvent,
   emitUserWinningEvent,
+  emitUserGiveUpMatchEvent,
+  emitUserSocketInitEvent,
 } from '../lib/socket';
-import { MATCH } from '../constants/modalTypes';
+import { MATCH, APP_STAGE_MATCH_STARTED } from '../constants/modalTypes';
 import { config } from '../config';
 
 const { JWT_SECRET, ROOT } = config;
@@ -138,14 +144,16 @@ const mapDispatchToProps = dispatch => {
         console.log(err);
       })
     },
-    async fetchRandomProblem(userIdOrProblemId, matchPartnerId, combatRoomKey, token) {
+    async fetchRandomProblem(userId, matchPartnerId, combatRoomKey, token, isHost) {
+      let problem, matchId;
       try {
-        let problem, matchId;
-        if (matchPartnerId) {
-          const responseRandomProblem = await fetch(`${ROOT}/api/problems/random?u_id=${userIdOrProblemId}&p_id=${matchPartnerId}`, {
+        if (isHost) {
+          const responseRandomProblem = await fetch(`${ROOT}/api/problems/random?u_id=${userId}&p_id=${matchPartnerId}`, {
             method: "GET",
             mode: "cors",
             headers: {
+              "Pragma": "no-cache",
+              "Cache-Control": "no-cache",
               "Content-Type": "application/json; charset=utf-8",
               "Authorization": `Bearer ${token}`
             },
@@ -160,19 +168,15 @@ const mapDispatchToProps = dispatch => {
               "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
-              host_id: userIdOrProblemId,
+              host_id: userId,
               guest_id: matchPartnerId,
             })
           });
           const bodyNewMatch = await responseNewMatch.json();
           matchId = bodyNewMatch._id;
-        } else {
-          const response = await fetch(`${ROOT}/api/problems/${userIdOrProblemId}`);
-          const body = await response.json();
-          problem = body.problem;
+
+          dispatch(matchProblemFetched(problem, matchId));
         }
-        dispatch(matchProblemFetched(problem, matchId));
-        emitSendRandomProblemEvent(problem, combatRoomKey, matchId);
       } catch(err) {
         console.log(err);
       }
@@ -254,9 +258,8 @@ const mapDispatchToProps = dispatch => {
       } catch (error) {
       }
     },
-    handlePartnerGiveUpMatch() {
-
-
+    giveUpMatch() {
+      dispatch(userGiveUpMatch());
     },
     checkUserAuth() {
       if (localStorage['algorithmFighter']) {
@@ -290,8 +293,11 @@ const mapDispatchToProps = dispatch => {
     changeCode(editor, data, code) {
       dispatch(codeChanged(code));
     },
-    closeModal() {
+    closeModal(appStage, token, user, matchResultList, solutionList) {
       dispatch(modalClose());
+      if (appStage !== APP_STAGE_MATCH_STARTED) {
+        dispatch(appStageReset(appStage, token, user, matchResultList, solutionList));
+      }
     },
     openModal(type, token){
       if (type === MATCH && token) {
@@ -309,6 +315,11 @@ const mapDispatchToProps = dispatch => {
     subscribeMatchTimerEvent() {
       subscribeMatchTimerEvent(time => {
         dispatch(matchTimer(time));
+      });
+    },
+    subscribeMatchPartnerGiveUpEvent() {
+      subscribeMatchPartnerGiveUpEvent(() => {
+        dispatch(matchPartnerMatchGiveUp());
       });
     },
     subscribeMatchPartnerWinningEvent() {
@@ -403,6 +414,12 @@ const mapDispatchToProps = dispatch => {
     emitUserWinningEvent(matchResult, combatRoomKey) {
       emitUserWinningEvent(matchResult, combatRoomKey);
     },
+    emitUserGiveUpMatchEvent(combatRoomKey, user) {
+      emitUserGiveUpMatchEvent(combatRoomKey, user);
+    },
+    emitUserSocketInitEvent(combatRoomKey, user) {
+      emitUserSocketInitEvent(combatRoomKey, user);
+    }
   };
 };
 

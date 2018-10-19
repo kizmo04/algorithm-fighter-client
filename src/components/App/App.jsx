@@ -19,6 +19,9 @@ import {
   APP_STAGE_MATCH_PROBLEM_FETCHED,
   APP_STAGE_MATCH_STARTED,
   APP_STAGE_MATCH_END,
+  APP_STAGE_INITIAL,
+  APP_STAGE_USER_GIVE_UP_MATCH,
+  APP_STAGE_MATCH_SUSPENDED,
 } from '../../constants/modalTypes';
 import {
   AUTH,
@@ -26,6 +29,7 @@ import {
 } from '../../constants/modalTypes';
 import _ from 'lodash';
 import UserDetail from "../UserDetail/UserDetail";
+import { emitUserGiveUpMatchEvent } from "../../lib/socket";
 
 class App extends Component {
   componentDidMount() {
@@ -33,7 +37,7 @@ class App extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { token, user, matchPartner, matchResult, problem, isFetching, appStage, combatRoomKey, matchId, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent, subscribeMatchPartnerSolutionSubmittedEvent, subscribeMatchTimerEvent, emitUserWinningEvent, subscribeMatchPartnerWinningEvent } = this.props;
+    const { token, user, isHost, matchPartner, matchResult, problem, isFetching, appStage, combatRoomKey, matchId, emitUserLoginEvent, emitUserLogoutEvent, subscribePendingMatchAcceptanceEvent, subscribeMatchPartnerRefuseMatchInvitationEvent, subscribeMatchPartnerUnavailableEvent, emitRefuseMatchInvitationEvent, emitAcceptMatchInvitationEvent, subscribeSendMatchInvitationEvent, emitFindMatchPartnerEvent, emitFindMatchPartnerEndEvent, unsubscribeMatchPartnerRefuseMatchInvitationEvent, unsubscribeSendMatchInvitationEvent, unsubscribePendingMatchAcceptanceEvent, unsubscribeMatchPartnerUnavailableEvent, fetchRandomProblem, emitSendRandomProblemEvent, subscribeMatchStartEvent, subscribeMatchPartnerEnteredEvent, subscribeMatchPartnerKeyDownEvent, subscribeMatchPartnerKeyUpEvent, subscribeMatchPartnerSolutionSubmittedEvent, subscribeMatchTimerEvent, emitUserWinningEvent, subscribeMatchPartnerWinningEvent, subscribeMatchPartnerGiveUpEvent, emitUserSocketInitEvent } = this.props;
 
     if (!prevProps.token && prevProps.token !== token) {
       emitUserLoginEvent(user);
@@ -48,7 +52,7 @@ class App extends Component {
         emitFindMatchPartnerEvent(user, combatRoomKey);
         subscribePendingMatchAcceptanceEvent();
         subscribeMatchPartnerUnavailableEvent();
-        unsubscribeSendMatchInvitationEvent();
+        // unsubscribeSendMatchInvitationEvent();
         break;
       case APP_STAGE_PENDING_MATCH_ACCEPTANCE:
         unsubscribePendingMatchAcceptanceEvent();
@@ -57,30 +61,33 @@ class App extends Component {
         subscribeMatchPartnerEnteredEvent();
         break;
       case APP_STAGE_RECEIVING_MATCH_INVITATION:
-        unsubscribeSendMatchInvitationEvent();
+        // unsubscribeSendMatchInvitationEvent();
         break;
       case APP_STAGE_MATCH_PARTNER_REFUSE_MATCH_INVITATION:
         unsubscribeMatchPartnerRefuseMatchInvitationEvent();
-        subscribeSendMatchInvitationEvent();
+        // subscribeSendMatchInvitationEvent();
         break;
       case APP_STAGE_MATCH_PARTNER_UNAVAILABLE:
         unsubscribeMatchPartnerUnavailableEvent();
         unsubscribePendingMatchAcceptanceEvent();
-        subscribeSendMatchInvitationEvent();
+        // subscribeSendMatchInvitationEvent();
         emitFindMatchPartnerEndEvent(combatRoomKey);
         break;
       case APP_STAGE_REFUSE_MATCH_INVITATION:
         emitRefuseMatchInvitationEvent(combatRoomKey, user);
-        subscribeSendMatchInvitationEvent();
+        // subscribeSendMatchInvitationEvent();
         break;
       case APP_STAGE_ACCEPT_MATCH_INVITATION:
         emitAcceptMatchInvitationEvent(combatRoomKey, user);
         subscribeMatchStartEvent();
         break;
       case APP_STAGE_MATCH_PREPARATION:
-        fetchRandomProblem(user._id, matchPartner._id, combatRoomKey, token);
+        if (isHost) {
+          fetchRandomProblem(user._id, matchPartner._id, combatRoomKey, token, isHost);
+        }
         break;
       case APP_STAGE_MATCH_PROBLEM_FETCHED:
+        emitSendRandomProblemEvent(problem, combatRoomKey, matchId);
         subscribeMatchStartEvent();
         break;
       case APP_STAGE_MATCH_STARTED:
@@ -89,17 +96,33 @@ class App extends Component {
         subscribeMatchPartnerSolutionSubmittedEvent();
         subscribeMatchTimerEvent();
         subscribeMatchPartnerWinningEvent();
+        subscribeMatchPartnerGiveUpEvent();
         break;
       case APP_STAGE_MATCH_END:
         emitUserWinningEvent(matchResult, combatRoomKey);
+        emitUserSocketInitEvent(combatRoomKey, user);
+        // subscribeSendMatchInvitationEvent();
         break;
+      case APP_STAGE_MATCH_SUSPENDED:
+        emitUserSocketInitEvent(combatRoomKey, user);
+        // subscribeSendMatchInvitationEvent();
+        break;
+      case APP_STAGE_USER_GIVE_UP_MATCH:
+        emitUserGiveUpMatchEvent(combatRoomKey, user);
+        // subscribeSendMatchInvitationEvent();
+        break;
+      case APP_STAGE_INITIAL:
+        emitUserGiveUpMatchEvent(combatRoomKey, user);
+        // subscribeSendMatchInvitationEvent();
+        break;      
       default:
         break;
     }
   }
 
   render() {
-    const { token, isFetching, expandedAccordionIndex, expandAccordion, authenticateUser, logoutUser, solutionList, matchResultList, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem, isMatchPartnerKeyPress, matchMessage, initMatchPartnerKeyPress, emitKeyDownEvent, emitKeyUpEvent, testResult, countPassed, isPassedAll, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, submitSolution, changeCode, code, matchTime, fetchUserPastMatchResult, fetchUserPastSolutions, collapseAccordion, updateMatchResult, matchResult } = this.props;
+    const { token, isFetching, expandedAccordionIndex, expandAccordion, authenticateUser, logoutUser, solutionList, matchResultList, isModalActive, modalType, modalMessage, openModal, closeModal, user, appStage, matchPartner, combatRoomKey, acceptMatchInvitation, refuseMatchInvitation, isMatchStarted, matchId, problem, isMatchPartnerKeyPress, matchMessage, initMatchPartnerKeyPress, emitKeyDownEvent, emitKeyUpEvent, testResult, countPassed, isPassedAll, matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll, submitSolution, changeCode, code, matchTime, fetchUserPastMatchResult, fetchUserPastSolutions, collapseAccordion, updateMatchResult, matchResult, giveUpMatch } = this.props;
+    const closeModalAndResetUserState = closeModal.bind(null, appStage, token, user, matchResultList, solutionList);
     const matchModalProps = {
       user,
       isFetching,
@@ -111,11 +134,11 @@ class App extends Component {
       onAcceptButtonClick: acceptMatchInvitation,
       onCancelButtonClick: refuseMatchInvitation,
       onRetryButtonClick: openModal.bind(null, MATCH, token),
-      onCloseButtonClick: closeModal,
+      onCloseButtonClick: closeModalAndResetUserState,
     };
     const authModalProps = {
       onGitHubLoginButtonClick: authenticateUser,
-      onCloseButtonClick: closeModal,
+      onCloseButtonClick: closeModalAndResetUserState,
     };
     const matchPartnerProps = {
       matchPartner,
@@ -137,9 +160,9 @@ class App extends Component {
         <Switch>
           <Route exact path="/" render={() => <Main user={user} onBattleButtonClick={openModal.bind(null, MATCH, token)} />}/>
           <Route path="/matches/:match_id" render={({ match }) => {
-            if (token) {
+            if (token && appStage !== APP_STAGE_INITIAL) {
               return (
-                <CombatMatch matchId={match.params.match_id} onDidUpdate={updateMatchResult} isFetching={isFetching} matchTime={matchTime} combatRoomKey={combatRoomKey} code={code} token={token} {...userProps} {...matchPartnerProps} changeCode={changeCode} onSubmitButtonClick={submitSolution} emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 500)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 1000)} matchMessage={matchMessage} problem={problem} />
+                <CombatMatch onSurrenderButtonClick={giveUpMatch} matchId={match.params.match_id} onDidUpdate={updateMatchResult} isFetching={isFetching} matchTime={matchTime} combatRoomKey={combatRoomKey} code={code} token={token} {...userProps} {...matchPartnerProps} changeCode={changeCode} onSubmitButtonClick={submitSolution} emitKeyDownEvent={_.debounce(emitKeyDownEvent.bind(null, combatRoomKey), 500)} emitKeyUpEvent={_.debounce(emitKeyUpEvent.bind(null, combatRoomKey), 1000)} matchMessage={matchMessage} problem={problem} />
                 );
               } else {
                 return <Redirect to="/" />;
@@ -153,7 +176,7 @@ class App extends Component {
             }
           }} />
         </Switch>
-        <Modal isActive={isModalActive} onCloseButtonClick={closeModal}>
+        <Modal isActive={isModalActive} onCloseButtonClick={closeModalAndResetUserState}>
           {
             modalType === AUTH ? <AuthModal {...authModalProps} /> : <MatchModal {...matchModalProps} isFetching={isFetching}/>
           }

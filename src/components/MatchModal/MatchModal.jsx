@@ -9,6 +9,9 @@ import {
   APP_STAGE_MATCH_PREPARATION,
   APP_STAGE_MATCH_PROBLEM_FETCHED,
   APP_STAGE_MATCH_END,
+  APP_STAGE_MATCH_SUSPENDED,
+  APP_STAGE_ACCEPT_MATCH_INVITATION,
+  APP_STAGE_USER_GIVE_UP_MATCH,
 } from '../../constants/modalTypes';
 import './MatchModal.scss';
 
@@ -76,13 +79,13 @@ class MatchModal extends Component {
             </div>
           </div>
         ) :
-        appStage === APP_STAGE_MATCH_PREPARATION || appStage === APP_STAGE_MATCH_PROBLEM_FETCHED ? (
+        appStage === APP_STAGE_MATCH_PREPARATION || appStage === APP_STAGE_MATCH_PROBLEM_FETCHED || appStage === APP_STAGE_ACCEPT_MATCH_INVITATION || appStage === APP_STAGE_USER_GIVE_UP_MATCH ? (
           <span className="subtitle is-small">{modalMessage}</span>
         ) :
         appStage === APP_STAGE_MATCH_END ? (
           <div className="columns is-multiline match-modal match-end">
             <div className="column is-half match-modal match-end">
-            <div className="subtitle is-danger is-small match-modal match-end winner-title">{matchResult.winner.user_name} Win!</div>
+            <div className="subtitle is-danger is-small match-modal match-end has-text-danger">{matchResult.winner.user_name} Win!</div>
             </div>
             <div className="column is-half match-modal match-end">
             <div className="subtitle is-small match-modal match-end loser-title">{matchResult.loser.user_name} Lose!</div>
@@ -92,7 +95,21 @@ class MatchModal extends Component {
             </div>
             <div className="column is-half match-modal match-end">
             <Link onClick={this.handleOnCloseButtonClick} className="button is-fullwidth is-small is-danger match-modal match-end" to={`/users/${user._id}/matches`}>지난 전투 보기</Link>
-
+            </div>
+          </div>
+        ) :
+        appStage === APP_STAGE_MATCH_SUSPENDED ? (
+          <div className="columns is-multiline match-modal match-end">
+            <div className="column is-full">
+            <span>
+              {modalMessage}
+            </span>
+            </div>
+            <div className="column is-half match-modal match-end">
+            <Link onClick={this.handleOnCloseButtonClick} className="button is-fullwidth is-small is-white match-modal match-end" to="/">메인으로</Link>
+            </div>
+            <div className="column is-half match-modal match-end">
+            <Link onClick={this.handleOnCloseButtonClick} className="button is-fullwidth is-small is-danger match-modal match-end" to={`/users/${user._id}/matches`}>지난 전투 보기</Link>
             </div>
           </div>
         ) : null

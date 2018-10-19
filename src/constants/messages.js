@@ -6,3 +6,5 @@ export const MESSAGE_MATCH_PREPARATION = '시합을 준비중입니다';
 export const MESSAGE_MATCH_PROBLEM_FETCHED = '문제가 준비되었습니다';
 export const MESSAGE_MATCH_PARTNER_KEY_DOWN = '상대가 타이핑 중입니다';
 export const MESSAGE_MATCH_PARTNER_SOLUTION_SUBMITTED = '상대가 답안을 제출했습니다';
+export const MESSAGE_USER_GIVE_UP_MATCH = '시합을 포기했습니다';
+export const MESSAGE_MATCH_PARTNER_GIVE_UP_MATCH = '상대가 시합을 포기했습니다';

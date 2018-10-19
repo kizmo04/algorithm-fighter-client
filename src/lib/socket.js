@@ -22,6 +22,9 @@ import {
   MATCH_TIMER,
   USER_WINNING,
   MATCH_PARTNER_WINNING,
+  USER_GIVE_UP,
+  MATCH_PARTNER_GIVE_UP,
+  USER_SOCKET_INIT,
 } from '../constants/socketEventTypes';
 import { config } from '../config';
 
@@ -65,6 +68,16 @@ const eventListenersMap = {};
 // 이것은 소켓이벤트 말고 각자 처리?
 // 혹은 서버에서 타이머를 돌리고 소켓 클라이언트들이 받아서 보여줌
 // 타이머 종료되면 서버에서 종료메세지 띄움.
+
+export function subscribeMatchPartnerGiveUpEvent(cb) {
+  const matchPartnerGiveUpEventListener = () => {
+    console.log('subs partner give up');
+    cb();
+  };
+  eventListenersMap[MATCH_PARTNER_GIVE_UP] = matchPartnerGiveUpEventListener;
+
+  socket.on(MATCH_PARTNER_GIVE_UP, matchPartnerGiveUpEventListener);
+}
 
 export function subscribeMatchPartnerWinningEvent(cb) {
   const matchPartnerWinningEventListener = (matchResult) => {
@@ -183,6 +196,7 @@ export function unsubscribePendingMatchAcceptanceEvent() {
 
 export function subscribeSendMatchInvitationEvent(cb) {
   const sendMatchInvitationEventListener = (hostUser, combatRoomKey) => {
+    console.log('subs send invitation')
     cb(hostUser, combatRoomKey);
   };
 
@@ -253,4 +267,14 @@ export function emitUserLogoutEvent() {
 
 export function emitUserWinningEvent(matchResult, combatRoomKey) {
   socket.emit(USER_WINNING, matchResult, combatRoomKey);
+}
+
+export function emitUserGiveUpMatchEvent(combatRoomKey, user) {
+  console.log('emit give up', combatRoomKey)
+  socket.emit(USER_GIVE_UP, combatRoomKey, user);
+}
+
+export function emitUserSocketInitEvent(combatRoomKey, user) {
+  console.log('init socket', user)
+  socket.emit(USER_SOCKET_INIT, combatRoomKey, user);
 }

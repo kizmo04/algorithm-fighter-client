@@ -72,12 +72,26 @@ progress.progress.is-small {
   // background-color: white;
 }
 
-.user-gauge-percent {
-  color: hsl(348, 100%, 61%);
+.is-outlined.is-win {
+  -webkit-animation: winning 5s linear;
+  -moz-animation: winning 5s linear;
+  animation: winning 5s linear;
 }
 
-.partner-gauge-percent {
-  color: hsl(204, 86%, 53%);
+@keyframes winnig {
+  0% {
+    outline: 1px solid hsl(204, 86%, 53%);
+  }
+  20% {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 100;
+    outline: 10vw solid hsl(204, 86%, 53%);
+  }
+  100% {
+    outline: 50vw solid hsl(204, 86%, 53%);
+  }
 }
 
 div#wave {
