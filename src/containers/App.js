@@ -69,6 +69,7 @@ import {
 import { MATCH, APP_STAGE_MATCH_STARTED } from '../constants/modalTypes';
 import { config } from '../config';
 
+<<<<<<< HEAD
 const { JWT_SECRET } = config;
 
 let ROOT;
@@ -78,6 +79,9 @@ if (process.env.NODE_ENV === 'development') {
 } else if (process.env.NODE_ENV === 'production') {
   ROOT = 'http://api.kizmo04.com';
 }
+=======
+const { JWT_SECRET, ROOT } = config;
+>>>>>>> dev
 
 library.add(fab);
 
