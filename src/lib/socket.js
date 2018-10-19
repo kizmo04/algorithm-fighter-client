@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'development') {
   ROOT = 'http://api.kizmo04.com';
 }
 
-const socket = io(ROOT, {
+const socket = io('http://localhost:5000', {
   reconnection: true,
   transports: ['websocket', 'polling']
 });
