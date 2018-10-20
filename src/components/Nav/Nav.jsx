@@ -21,12 +21,12 @@ class Nav extends Component {
       <nav className="navbar">
         <div className="navbar-brand">
           <Link to="/">
-            <img src="" alt="" />
+            <img className="image logo-image" src="https://bulma.io/images/bulma-logo.png" width="200" height="40" />
           </Link>
           <Link
             to=""
             role="button"
-            className="navbar-burger"
+            className=""
             aria-label="menu"
             aria-expanded="false"
           >
@@ -34,8 +34,7 @@ class Nav extends Component {
             <span aria-hidden="true" />
             <span aria-hidden="true" />
           </Link>
-        </div>
-        <div className="navbar-menu">
+        <div className="nav-bar-menus">
           {token ? (
             <div className="navbar-end">
               <button
@@ -44,7 +43,7 @@ class Nav extends Component {
               >
                 Log out
               </button>
-              <Link to={`/users/${user._id}`} className="navbar-item is-small button is-light is-outlined">
+              <Link to={`/users/${user._id}/matches`} className="navbar-item is-small button is-light is-outlined">
                 {user.email}
               </Link>
             </div>
@@ -58,6 +57,7 @@ class Nav extends Component {
               </button>
             </div>
           )}
+        </div>
         </div>
       </nav>
     );

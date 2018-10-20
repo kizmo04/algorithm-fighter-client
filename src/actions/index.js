@@ -28,6 +28,8 @@ import {
   APP_STAGE_RESET,
   USER_GIVE_UP_MATCH,
   MATCH_PARTNER_GIVE_UP_MATCH,
+  REQUEST_USER_PAST_MATCH_RESULT,
+  REQUEST_USER_PAST_SOLUTION_LIST,
 } from '../constants/actionTypes';
 import {
   AUTH,
@@ -266,6 +268,21 @@ export function successUserPastMatchResult(matchResultList) {
   return {
     type: SUCCESS_USER_PAST_MATCH_RESULT,
     matchResultList,
+    isFetching: false,
+  };
+}
+
+export function requestUserPastMatchResult() {
+  return {
+    type: REQUEST_USER_PAST_MATCH_RESULT,
+    isFetching: true,
+  };
+}
+
+export function requestUserPastSolutionList() {
+  return {
+    type: REQUEST_USER_PAST_SOLUTION_LIST,
+    isFetching: true,
   };
 }
 
@@ -273,6 +290,7 @@ export function successUserPastSolutionList(solutionList) {
   return {
     type: SUCCESS_USER_PAST_SOLUTION_LIST,
     solutionList,
+    isFetching: false,
   };
 }
 

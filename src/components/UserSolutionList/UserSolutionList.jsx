@@ -37,14 +37,12 @@ class UserSolutionList extends Component {
       autoRefresh: true,
       readOnly: true,
     };
-    const { solutions, expandedAccordionIndex } = this.props;
-
-    console.log(solutions[0]);
+    const { solutions, expandedAccordionIndex, isFetching } = this.props;
 
     return (
       <Fragment>
         {
-          solutions.map((solution, i) => (
+          !isFetching ? solutions.map((solution, i) => (
             <div className="columns">
               <div className="column"></div>
               <div className="column is-10">
@@ -75,6 +73,7 @@ class UserSolutionList extends Component {
               <div className="column"></div>
             </div>
           ))
+          : <div className="spinner"></div>
         }
       </Fragment>
     );

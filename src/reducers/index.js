@@ -28,6 +28,8 @@ import {
   APP_STAGE_RESET,
   USER_GIVE_UP_MATCH,
   MATCH_PARTNER_GIVE_UP_MATCH,
+  REQUEST_USER_PAST_MATCH_RESULT,
+  REQUEST_USER_PAST_SOLUTION_LIST,
 } from '../constants/actionTypes';
 
 const initialState = {
@@ -50,7 +52,7 @@ const initialState = {
   testResult: {},
   countPassed: 0,
   isPassedAll: false,
-  code: '',
+  code: 'function solution() {\n\n\n\n}\n',
   matchId: '',
   matchTime: '',
   isFetching: false,
@@ -210,13 +212,23 @@ function reducer(state = initialState, action) {
       return Object.assign({}, state, {
         isFetching: action.isFetching,
       });
+    case REQUEST_USER_PAST_MATCH_RESULT:
+      return Object.assign({}, state, {
+        isFetching: action.isFetching,
+      });
+    case REQUEST_USER_PAST_SOLUTION_LIST:
+      return Object.assign({}, state, {
+        isFetching: action.isFetching,
+      });
     case SUCCESS_USER_PAST_MATCH_RESULT:
       return Object.assign({}, state, {
         matchResultList: action.matchResultList,
+        isFetching: action.isFetching,
       });
     case SUCCESS_USER_PAST_SOLUTION_LIST:
       return Object.assign({}, state, {
         solutionList: action.solutionList,
+        isFetching: action.isFetching,
       });
     case ACCORDION_EXPANDED:
       return Object.assign({}, state, {

@@ -34,6 +34,8 @@ import {
   appStageReset,
   matchPartnerMatchGiveUp,
   userGiveUpMatch,
+  requestUserPastMatchResult,
+  requestUserPastSolutionList,
 } from '../actions';
 import {
   subscribeMatchPartnerGiveUpEvent,
@@ -203,6 +205,7 @@ const mapDispatchToProps = dispatch => {
       }
     },
     async fetchUserPastMatchResult(userId, token) {
+      dispatch(requestUserPastMatchResult());
       try {
         const response = await fetch(`${ROOT}/api/users/${userId}/matches`, {
           method: "GET",
@@ -221,6 +224,7 @@ const mapDispatchToProps = dispatch => {
       }
     },
     async fetchUserPastSolutions(userId, token) {
+      dispatch(requestUserPastSolutionList());
       try {
         const response = await fetch(`${ROOT}/api/users/${userId}/solutions`, {
           method: "GET",

@@ -8,3 +8,32 @@ div.user-detail-menu {
     border-bottom-color: red;
   }
 }
+
+.user-detail-profile.user-info-image {
+  display: inline-block;
+}
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+
+.spinner {
+  position: relative;
+  height: 30px;
+}
+
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid rgb(138, 138, 138);
+  border-top-color: #121212;
+  animation: spinner 1s linear infinite;
+}
