@@ -28,9 +28,9 @@ import {
 } from '../constants/socketEventTypes';
 import { config } from '../config';
 
-const { ROOT } = config;
+const { SOCKET_ROOT } = config;
 
-const socket = io(ROOT, {
+const socket = io(SOCKET_ROOT, {
   reconnection: true,
   transports: ['websocket', 'polling']
 });
