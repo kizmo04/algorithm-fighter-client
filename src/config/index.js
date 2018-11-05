@@ -5,7 +5,7 @@ if (process.env.REACT_APP_NODE_ENV === 'development') {
   SOCKET_ROOT = '';
 } else if (process.env.NODE_ENV === 'production') {
   ROOT = 'https://api.kizmo04.com';
-  SOCKET_ROOT = 'http://172.31.4.127:8081';
+  SOCKET_ROOT = 'http://13.125.219.23:8081';
 }
 
 export const config = {
