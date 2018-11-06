@@ -30,10 +30,7 @@ import { config } from '../config';
 
 const { SOCKET_ROOT } = config;
 
-const socket = io(SOCKET_ROOT, {
-  reconnection: true,
-  transports: ['websocket', 'polling']
-});
+const socket = io(SOCKET_ROOT);
 
 const eventListenersMap = {};
 
