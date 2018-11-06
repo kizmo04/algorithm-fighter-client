@@ -20,8 +20,8 @@ class Nav extends Component {
     return (
       <nav className="navbar">
         <div className="navbar-brand">
-          <Link to="/">
-            <img className="image logo-image" src="https://bulma.io/images/bulma-logo.png" width="200" height="40" />
+          <Link to="/" className="has-text-danger is-medium">
+            Algorithm Fighter
           </Link>
           <Link
             to=""
