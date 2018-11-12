@@ -1,5 +1,7 @@
 # Algorithm-Fighter-Client
 
+[![](README.assets/preview.png)](https://www.youtube.com/watch?v=ZD3uf5KIFWg&feature=youtu.be)
+
 Algorithm Fighter는 web socket을 활용한 실시간 1:1 대전 방식의 알고리즘 문제 풀이 플랫폼입니다
 
 
