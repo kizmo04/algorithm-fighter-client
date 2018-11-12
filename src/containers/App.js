@@ -1,9 +1,12 @@
-import { connect } from 'react-redux';
-import AppComponent from '../components/App/App';
-import { signIn as signInGitHub, signOut as signOutGitHub } from '../lib/firebase';
-import jwt from 'jsonwebtoken';
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fab } from '@fortawesome/free-brands-svg-icons'
+import { connect } from "react-redux";
+import AppComponent from "../components/App/App";
+import {
+  signIn as signInGitHub,
+  signOut as signOutGitHub
+} from "../lib/firebase";
+import jwt from "jsonwebtoken";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fab } from "@fortawesome/free-brands-svg-icons";
 import {
   successUserAuthentication,
   userLogout,
@@ -35,8 +38,8 @@ import {
   matchPartnerMatchGiveUp,
   userGiveUpMatch,
   requestUserPastMatchResult,
-  requestUserPastSolutionList,
-} from '../actions';
+  requestUserPastSolutionList
+} from "../actions";
 import {
   subscribeMatchPartnerGiveUpEvent,
   subscribeMatchPartnerWinningEvent,
@@ -66,10 +69,10 @@ import {
   emitSolutionSubmittedEvent,
   emitUserWinningEvent,
   emitUserGiveUpMatchEvent,
-  emitUserSocketInitEvent,
-} from '../lib/socket';
-import { MATCH, APP_STAGE_MATCH_STARTED } from '../constants/modalTypes';
-import { config } from '../config';
+  emitUserSocketInitEvent
+} from "../lib/socket";
+import { MATCH, APP_STAGE_MATCH_STARTED } from "../constants/modalTypes";
+import { config } from "../config";
 
 const { JWT_SECRET, ROOT } = config;
 
@@ -79,87 +82,114 @@ const mapStateToProps = state => Object.assign({}, state);
 
 const mapDispatchToProps = dispatch => {
   return {
-    authenticateUser () {
+    authenticateUser() {
       signInGitHub()
-      .then(result => {
-        const { email, displayName, photoURL} = result.user;
-        const { bio, login } = result.additionalUserInfo.profile;
-        fetch(`${ROOT}/api/auth`, {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json; charset=utf-8"
-          },
-          body: JSON.stringify({
-            email,
-            name: displayName,
-            user_name: login,
-            short_bio: bio,
-            profile_image_url: photoURL,
-          })
-        })
-        .then(response => {
-          const contentType = response.headers.get("content-type");
-          if(response.ok && contentType && contentType.includes("application/json")) {
-            return response.json();
-          }
-          throw new Error();
-        })
-        .then(body => {
-          const { token } = body;
-          jwt.verify(token, JWT_SECRET, function(err, decoded) {
-            if (err) {
-              console.log(err);
-            }
-            const { _id, name, userName, profileImageUrl, email, shortBio, createdAt, solutions } = decoded;
-            const user = {
-              _id,
-              name,
-              userName,
-              profileImageUrl,
+        .then(result => {
+          const { email, displayName, photoURL } = result.user;
+          const { bio, login } = result.additionalUserInfo.profile;
+          fetch(`${ROOT}/api/auth`, {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8"
+            },
+            body: JSON.stringify({
               email,
-              shortBio,
-              createdAt,
-              solutions,
-            };
-            localStorage.setItem('algorithmFighter', JSON.stringify({ token }));
-            dispatch(successUserAuthentication(token, user));
-          });
+              name: displayName,
+              user_name: login,
+              short_bio: bio,
+              profile_image_url: photoURL
+            })
+          })
+            .then(response => {
+              const contentType = response.headers.get("content-type");
+              if (
+                response.ok &&
+                contentType &&
+                contentType.includes("application/json")
+              ) {
+                return response.json();
+              }
+              throw new Error();
+            })
+            .then(body => {
+              const { token } = body;
+              jwt.verify(token, JWT_SECRET, function(err, decoded) {
+                if (err) {
+                  console.error(err);
+                }
+                const {
+                  _id,
+                  name,
+                  userName,
+                  profileImageUrl,
+                  email,
+                  shortBio,
+                  createdAt,
+                  solutions
+                } = decoded;
+                const user = {
+                  _id,
+                  name,
+                  userName,
+                  profileImageUrl,
+                  email,
+                  shortBio,
+                  createdAt,
+                  solutions
+                };
+                localStorage.setItem(
+                  "algorithmFighter",
+                  JSON.stringify({ token })
+                );
+                dispatch(successUserAuthentication(token, user));
+              });
+            })
+            .catch(err => {
+              console.error(err.message);
+            });
         })
         .catch(err => {
-          console.log(err.message);
+          console.error(err.message);
         });
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
     },
     logoutUser() {
       signOutGitHub()
-      .then(() => {
-        if (localStorage['algorithmFighter']) {
-          localStorage['algorithmFighter'].token = '';
-        }
-        dispatch(userLogout());
-      })
-      .catch(err => {
-        console.log(err);
-      })
+        .then(() => {
+          if (localStorage["algorithmFighter"]) {
+            const storage = JSON.parse(localStorage["algorithmFighter"]);
+            storage.token = "";
+            localStorage["algorithmFighter"] = JSON.stringify(storage);
+          }
+          dispatch(userLogout());
+        })
+        .catch(err => {
+          console.error(err);
+        });
     },
-    async fetchRandomProblem(userId, matchPartnerId, combatRoomKey, token, isHost) {
+    async fetchRandomProblem(
+      userId,
+      matchPartnerId,
+      combatRoomKey,
+      token,
+      isHost
+    ) {
       let problem, matchId;
       try {
         if (isHost) {
-          const responseRandomProblem = await fetch(`${ROOT}/api/problems/random?u_id=${userId}&p_id=${matchPartnerId}`, {
-            method: "GET",
-            mode: "cors",
-            headers: {
-              "Pragma": "no-cache",
-              "Cache-Control": "no-cache",
-              "Content-Type": "application/json; charset=utf-8",
-              "Authorization": `Bearer ${token}`
-            },
-          });
+          const responseRandomProblem = await fetch(
+            `${ROOT}/api/problems/random?u_id=${userId}&p_id=${matchPartnerId}`,
+            {
+              method: "GET",
+              mode: "cors",
+              headers: {
+                Pragma: "no-cache",
+                "Cache-Control": "no-cache",
+                "Content-Type": "application/json; charset=utf-8",
+                Authorization: `Bearer ${token}`
+              }
+            }
+          );
           const bodyRandomProblem = await responseRandomProblem.json();
           problem = bodyRandomProblem.problem;
           const responseNewMatch = await fetch(`${ROOT}/api/matches`, {
@@ -167,11 +197,11 @@ const mapDispatchToProps = dispatch => {
             mode: "cors",
             headers: {
               "Content-Type": "application/json; charset=utf-8",
-              "Authorization": `Bearer ${token}`
+              Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({
               host_id: userId,
-              guest_id: matchPartnerId,
+              guest_id: matchPartnerId
             })
           });
           const bodyNewMatch = await responseNewMatch.json();
@@ -179,8 +209,8 @@ const mapDispatchToProps = dispatch => {
 
           dispatch(matchProblemFetched(problem, matchId));
         }
-      } catch(err) {
-        console.log(err);
+      } catch (err) {
+        console.error(err);
       }
     },
     async submitSolution(userId, code, problemId, token, combatRoomKey) {
@@ -192,16 +222,23 @@ const mapDispatchToProps = dispatch => {
           mode: "cors",
           headers: {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`
           }
         });
 
         const body = await response.json();
         const { testResult, countPassed, isPassedAll } = body;
-        dispatch(successSolutionSubmit(testResult, countPassed, isPassedAll, false));
-        emitSolutionSubmittedEvent(testResult, countPassed, isPassedAll, combatRoomKey);
-      } catch(err) {
-        console.log(err);
+        dispatch(
+          successSolutionSubmit(testResult, countPassed, isPassedAll, false)
+        );
+        emitSolutionSubmittedEvent(
+          testResult,
+          countPassed,
+          isPassedAll,
+          combatRoomKey
+        );
+      } catch (err) {
+        console.error(err);
       }
     },
     async fetchUserPastMatchResult(userId, token) {
@@ -212,7 +249,7 @@ const mapDispatchToProps = dispatch => {
           mode: "cors",
           headers: {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         });
 
@@ -220,7 +257,7 @@ const mapDispatchToProps = dispatch => {
 
         dispatch(successUserPastMatchResult(body));
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
     async fetchUserPastSolutions(userId, token) {
@@ -231,7 +268,7 @@ const mapDispatchToProps = dispatch => {
           mode: "cors",
           headers: {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         });
 
@@ -239,54 +276,66 @@ const mapDispatchToProps = dispatch => {
 
         dispatch(successUserPastSolutionList(body));
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
-    async updateMatchResult (token, userId, matchId) {
+    async updateMatchResult(token, userId, matchId) {
       try {
         const response = await fetch(`${ROOT}/api/matches/${matchId}`, {
-          method: 'PUT',
-          mode: 'cors',
+          method: "PUT",
+          mode: "cors",
           body: JSON.stringify({
             winner_id: userId
           }),
           headers: {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         });
 
         const body = await response.json();
 
         dispatch(successMatchEnd(body));
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     giveUpMatch() {
       dispatch(userGiveUpMatch());
     },
     checkUserAuth() {
-      if (localStorage['algorithmFighter']) {
-        const token = JSON.parse(localStorage['algorithmFighter']).token;
-        jwt.verify(token, JWT_SECRET, (err, decoded) => {
-          if (err) {
-            console.log(err);
-          }
-          const { _id, name, userName, profileImageUrl, email, shortBio, createdAt, solutions } = decoded;
-          const user = {
-            _id,
-            name,
-            userName,
-            profileImageUrl,
-            email,
-            shortBio,
-            createdAt,
-            solutions,
-          };
-          dispatch(successUserAuthentication(token, user));
-        });
+      if (localStorage["algorithmFighter"]) {
+        const token = JSON.parse(localStorage["algorithmFighter"]).token;
+        if (token) {
+          jwt.verify(token, JWT_SECRET, (err, decoded) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            const {
+              _id,
+              name,
+              userName,
+              profileImageUrl,
+              email,
+              shortBio,
+              createdAt,
+              solutions
+            } = decoded;
+            const user = {
+              _id,
+              name,
+              userName,
+              profileImageUrl,
+              email,
+              shortBio,
+              createdAt,
+              solutions
+            };
+            dispatch(successUserAuthentication(token, user));
+          });
+        } else {
+          return;
+        }
       }
-
     },
     expandAccordion(index) {
       dispatch(accordionExpanded(index));
@@ -300,10 +349,12 @@ const mapDispatchToProps = dispatch => {
     closeModal(appStage, token, user, matchResultList, solutionList) {
       dispatch(modalClose());
       if (appStage !== APP_STAGE_MATCH_STARTED) {
-        dispatch(appStageReset(appStage, token, user, matchResultList, solutionList));
+        dispatch(
+          appStageReset(appStage, token, user, matchResultList, solutionList)
+        );
       }
     },
-    openModal(type, token){
+    openModal(type, token) {
       if (type === MATCH && token) {
         dispatch(matchModalOpen());
       } else {
@@ -332,9 +383,21 @@ const mapDispatchToProps = dispatch => {
       });
     },
     subscribeMatchPartnerSolutionSubmittedEvent() {
-      subscribeMatchPartnerSolutionSubmittedEvent((matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll) => {
-        dispatch(matchPartnerSolutionSubmitted(matchPartnerTestResult, matchPartnerCountPassed, matchPartnerIsPassedAll));
-      });
+      subscribeMatchPartnerSolutionSubmittedEvent(
+        (
+          matchPartnerTestResult,
+          matchPartnerCountPassed,
+          matchPartnerIsPassedAll
+        ) => {
+          dispatch(
+            matchPartnerSolutionSubmitted(
+              matchPartnerTestResult,
+              matchPartnerCountPassed,
+              matchPartnerIsPassedAll
+            )
+          );
+        }
+      );
     },
     subscribeMatchPartnerUnavailableEvent() {
       subscribeMatchPartnerUnavailableEvent(() => {
@@ -397,7 +460,7 @@ const mapDispatchToProps = dispatch => {
     emitRefuseMatchInvitationEvent(combatRoomKey, guestUser) {
       emitRefuseMatchInvitationEvent(combatRoomKey, guestUser);
     },
-    emitUserLoginEvent(user){
+    emitUserLoginEvent(user) {
       emitUserLoginEvent(user);
     },
     emitUserLogoutEvent() {

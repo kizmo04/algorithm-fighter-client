@@ -1,13 +1,24 @@
-import React, { Component } from 'react';
-import { Link, Switch, Route } from 'react-router-dom';
-import UserMatchList from '../UserMatchList/UserMatchList';
-import UserSolutionList from '../UserSolutionList/UserSolutionList';
-import './UserDetail.scss';
+import React, { Component } from "react";
+import { Link, Switch, Route } from "react-router-dom";
+import UserMatchList from "../UserMatchList/UserMatchList";
+import UserSolutionList from "../UserSolutionList/UserSolutionList";
+import "./UserDetail.scss";
 
 class UserDetail extends Component {
   render() {
-    const { user, token, solutionList, fetchUserPastSolutions, fetchUserPastMatchResult, matchResultList, pathName, expandedAccordionIndex, expandAccordion, collapseAccordion } = this.props;
-    const { profileImageUrl, userName, email, name, shortBio, createdAt, isFetching } = this.props.user;
+    const {
+      user,
+      token,
+      solutionList,
+      fetchUserPastSolutions,
+      fetchUserPastMatchResult,
+      matchResultList,
+      pathName,
+      expandedAccordionIndex,
+      expandAccordion,
+      collapseAccordion
+    } = this.props;
+    const { profileImageUrl, userName, shortBio, isFetching } = this.props.user;
     return (
       <div className="columns is-multiline">
         <div className="column is-full">
@@ -21,29 +32,63 @@ class UserDetail extends Component {
         <div className="column is-full">
           <div className="user-detail-menu tabs is-fullwidth is-small">
             <ul>
-              <li className={`${pathName.includes('matches') ? 'is-active' : ''}`}>
+              <li
+                className={`${pathName.includes("matches") ? "is-active" : ""}`}
+              >
                 <Link className="tab-menu" to={`/users/${user._id}/matches`}>
-                  <span class="icon"><i class="fas fa-angle-left" aria-hidden="true"></i></span>
+                  <span class="icon">
+                    <i class="fas fa-angle-left" aria-hidden="true" />
+                  </span>
                   <span>Past Match Results</span>
                 </Link>
               </li>
-              <li className={`${pathName.includes('solutions') ? 'is-active' : ''}`}>
+              <li
+                className={`${
+                  pathName.includes("solutions") ? "is-active" : ""
+                }`}
+              >
                 <Link className="tab-menu" to={`/users/${user._id}/solutions`}>
                   <span>Past Solutions</span>
-                  <span class="icon"><i class="fas fa-angle-right" aria-hidden="true"></i></span>
+                  <span class="icon">
+                    <i class="fas fa-angle-right" aria-hidden="true" />
+                  </span>
                 </Link>
               </li>
             </ul>
           </div>
           <div className="container">
             <Switch>
-              <Route path={'/users/:user_id/matches'} render={() => {
-                console.log('match list render')
-                return <UserMatchList isFetching={isFetching} user={user} token={token} onDidMount={fetchUserPastMatchResult} matches={matchResultList} />;
-              }} />
-              <Route path={'/users/:user_id/solutions'} render={() => {
-                return <UserSolutionList isFetching={isFetching} expandAccordion={expandAccordion} collapseAccordion={collapseAccordion} expandedAccordionIndex={expandedAccordionIndex} user={user} token={token} onDidMount={fetchUserPastSolutions} solutions={solutionList} />;
-              }} />
+              <Route
+                path={"/users/:user_id/matches"}
+                render={() => {
+                  return (
+                    <UserMatchList
+                      isFetching={isFetching}
+                      user={user}
+                      token={token}
+                      onDidMount={fetchUserPastMatchResult}
+                      matches={matchResultList}
+                    />
+                  );
+                }}
+              />
+              <Route
+                path={"/users/:user_id/solutions"}
+                render={() => {
+                  return (
+                    <UserSolutionList
+                      isFetching={isFetching}
+                      expandAccordion={expandAccordion}
+                      collapseAccordion={collapseAccordion}
+                      expandedAccordionIndex={expandedAccordionIndex}
+                      user={user}
+                      token={token}
+                      onDidMount={fetchUserPastSolutions}
+                      solutions={solutionList}
+                    />
+                  );
+                }}
+              />
             </Switch>
           </div>
         </div>

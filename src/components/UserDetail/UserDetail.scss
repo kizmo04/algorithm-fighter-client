@@ -14,7 +14,9 @@ div.user-detail-menu {
 }
 
 @keyframes spinner {
-  to {transform: rotate(360deg);}
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner {
@@ -23,7 +25,7 @@ div.user-detail-menu {
 }
 
 .spinner:before {
-  content: '';
+  content: "";
   box-sizing: border-box;
   position: absolute;
   top: 50%;

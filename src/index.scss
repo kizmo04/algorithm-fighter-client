@@ -15,14 +15,11 @@ $modal-card-head-border-bottom: hsl(0, 0%, 20%);
 $modal-card-body-background-color: hsl(0, 0%, 20%);
 $modal-card-foot-border-top: hsl(0, 0%, 20%);
 $modal-card-title-color: hsl(0, 0%, 98%);
-
-// $link: hsl(0, 0%, 96%);
 $link: hsl(348, 100%, 61%);
 $border-hover: white;
 
-// @import './components/CombatMatch/github.css';
-@import 'bulma';
-@import '~bulma-timeline';
+@import "bulma";
+@import "~bulma-timeline";
 
 body {
   padding: 0 20px 0 20px;
@@ -43,4 +40,3 @@ code {
   margin-left: 0;
   margin-right: 0;
 }
-

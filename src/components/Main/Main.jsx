@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import './Main.scss';
+import "./Main.scss";
 
 class Main extends Component {
   constructor(props) {
@@ -7,8 +7,8 @@ class Main extends Component {
     this.handleOnClick = this.handleOnClick.bind(this);
   }
 
-  handleOnClick(){
-    const { user, token, onBattleButtonClick } = this.props;
+  handleOnClick() {
+    const { token, onBattleButtonClick } = this.props;
     onBattleButtonClick(token);
   }
 
@@ -18,8 +18,15 @@ class Main extends Component {
         <div className="hero-body">
           <div className="container">
             <h1 className="title main-title">Algorithm Fighter</h1>
-            <h2 className="subtitle main-subtitle">Who will be the next algorithm champion?</h2>
-            <button onClick={this.handleOnClick} className="button is-outlined is-large is-danger is-bold">GO Fight!</button>
+            <h2 className="subtitle main-subtitle">
+              Who will be the next algorithm champion?
+            </h2>
+            <button
+              onClick={this.handleOnClick}
+              className="button is-outlined is-large is-danger is-bold"
+            >
+              GO Fight!
+            </button>
           </div>
         </div>
       </section>

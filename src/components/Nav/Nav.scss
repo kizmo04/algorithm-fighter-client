@@ -1,5 +1,11 @@
 .navbar {
   padding-top: 1rem;
+  & .navbar-brand {
+    & .app-logo {
+      margin-left: 20px;
+      font-weight: 700;
+    }
+  }
 }
 
 .navbar-end {

@@ -12,7 +12,6 @@
 }
 
 .user-profile-image.combat-match-user-status.partner {
-  // vertical-align: middle;
   position: absolute;
   left: 0.8rem;
 }
@@ -68,8 +67,6 @@ progress.progress.is-small {
 
 .user-gauge {
   transform: rotate(180deg);
-  // position: absolute;
-  // background-color: white;
 }
 
 .is-outlined.is-win {
@@ -98,19 +95,13 @@ div#wave {
   position: absolute;
   right: -4px;
   bottom: -40px;
-  // margin-top:50vh;
-  // text-align:center;
-  // width:100px;
-  // height:100px;
-  // margin-left: auto;
-  // margin-right: auto;
   .dot {
-    display:inline-block;
-    width:12px;
-    height:12px;
-    border-radius:50%;
-    margin-right:3px;
-    background:hsl(204, 86%, 53%);
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 3px;
+    background: hsl(204, 86%, 53%);
     animation: wave 1.3s linear infinite;
 
     &:nth-child(2) {
@@ -124,7 +115,9 @@ div#wave {
 }
 
 @keyframes wave {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: initial;
   }
 

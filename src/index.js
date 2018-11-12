@@ -19,8 +19,6 @@ export const store = createStore(
   compose(applyMiddleware(routerMiddleware(history), logger))
 );
 
-// store.subscribe(handleSocketRequestUserInfo.bind(null, store.getState().user));
-
 render(
   <Provider store={store}>
     <ConnectedRouter history={history}>

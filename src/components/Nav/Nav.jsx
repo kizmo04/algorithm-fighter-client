@@ -12,7 +12,7 @@ class Nav extends Component {
     this.props.onLogoutButtonClick();
   }
   handleOnLoginButtonClick() {
-    const { user, onLoginButtonClick } = this.props;
+    const { onLoginButtonClick } = this.props;
     onLoginButtonClick();
   }
   render() {
@@ -20,7 +20,7 @@ class Nav extends Component {
     return (
       <nav className="navbar">
         <div className="navbar-brand">
-          <Link to="/" className="has-text-danger is-medium">
+          <Link to="/" className="app-logo has-text-danger is-medium">
             Algorithm Fighter
           </Link>
           <Link
@@ -34,30 +34,33 @@ class Nav extends Component {
             <span aria-hidden="true" />
             <span aria-hidden="true" />
           </Link>
-        <div className="nav-bar-menus">
-          {token ? (
-            <div className="navbar-end">
-              <button
-                className="navbar-item button is-link is-small is-outlined"
-                onClick={this.handleOnLogoutButtonClick}
-              >
-                Log out
-              </button>
-              <Link to={`/users/${user._id}/matches`} className="navbar-item is-small button is-light is-outlined">
-                {user.email}
-              </Link>
-            </div>
-          ) : (
-            <div className="navbar-end">
-              <button
-                className="navbar-item button is-warning is-small is-outlined"
-                onClick={this.handleOnLoginButtonClick}
-              >
-                Log in / Sign up
-              </button>
-            </div>
-          )}
-        </div>
+          <div className="nav-bar-menus">
+            {token ? (
+              <div className="navbar-end">
+                <button
+                  className="navbar-item button is-link is-small is-outlined"
+                  onClick={this.handleOnLogoutButtonClick}
+                >
+                  Log out
+                </button>
+                <Link
+                  to={`/users/${user._id}/matches`}
+                  className="navbar-item is-small button is-light is-outlined"
+                >
+                  {user.email}
+                </Link>
+              </div>
+            ) : (
+              <div className="navbar-end">
+                <button
+                  className="navbar-item button is-warning is-small is-outlined"
+                  onClick={this.handleOnLoginButtonClick}
+                >
+                  Log in / Sign up
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
     );
