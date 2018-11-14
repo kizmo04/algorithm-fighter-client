@@ -58,7 +58,7 @@ npm start
 
 - ES5+
 - Node.js, Express.js
-- MongoDB, Momgoose ODM, mlab
+- MongoDB, Mongoose ODM, mlab
 - Socket.io
 - Node-Cron
 
